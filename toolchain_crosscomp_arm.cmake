@@ -30,51 +30,52 @@
 #
 ###############################################################################
 
-#     Author: Kristof Denolf <kristof@xilinx.com>
-#     Date:   2018/9/23
+#     Authors: Kristof Denolf <kristof@xilinx.com> 
+#              Alireza Khodamoradi <alirezak@xilinx.com>
+#     Date:   2020/12/3
 
-# cmake -D CMAKE_TOOLCHAIN_FILE=toolchain_crosscomp_arm.cmake ..
-#  -DSDxPlatform="<absolute path to platform or predefined sdx platform name>"
-#  -DSDxArch="arm32 or arm64"
-#  -DSDxSysroot="absolute path to the sysroot folder"
-
-set(SDxPlatform "zcu102" CACHE STRING "SDx platform")
-
-if (${SDxPlatform} STREQUAL "zcu102") 		#zcu102 clock ID def (MHz): 0=100, 1=200, 2=300, 3=400
-  set(SDxClockID "3" CACHE STRING "SDx clock ID")
-  message(STATUS "zcu102 clock def in MHz: 0=100, 1=200, 2=300, 3=400")
-  set(SDxArch "arm64")
-elseif (${SDxPlatform} STREQUAL "zc706") 	#zc706 clock ID def (MHz): 0=166, 1=143, 2=100, 3=200
-  set(SDxClockID "3" CACHE STRING "SDx clock ID")
-  message(STATUS "zc706 clock def in MHz: 0=100, 1=200, 2=300, 3=400")
-  set(SDxArch "arm32")
-elseif (${SDxPlatform} STREQUAL "zc702") 	#zc702 clock ID def (MHz): 0=166, 1=143, 2=100, 3=200
-  set(SDxClockID "3" CACHE STRING "SDx clock ID")
-  message(STATUS "zc702 clock def in MHz:  0=166, 1=143, 2=100, 3=200")
-  set(SDxArch "arm32")
-else (${SDxPlatform} STREQUAL "zcu102")
-  message(STATUS "non default platform, please also set SDx clock ID (default clock ID is 0) and SDx arch (default is 64 bit)")
-  set(SDxClockID "0" CACHE STRING "SDx clock ID")
-  set(SDxArch "arm64" CACHE STRING "SDx aarch")
-endif (${SDxPlatform} STREQUAL "zcu102")
+# cmake -DCMAKE_TOOLCHAIN_FILE=toolchain_crosscomp_arm.cmake ..
+#  -DVitisArch="arm32 or arm64"
+#  -DVitisSysroot="absolute path to the sysroot folder"
 
 
-#preparation for XSDK path
-execute_process(COMMAND which xsdk OUTPUT_VARIABLE XSDK)
-get_filename_component(XSDK_PARENT ${XSDK} PATH)
-get_filename_component(XSDK_PARENT ${XSDK_PARENT} PATH)
+#set(SDxPlatform "zcu102" CACHE STRING "SDx platform")
 
-# give th system information
+#if (${SDxPlatform} STREQUAL "zcu102") 		#zcu102 clock ID def (MHz): 0=100, 1=200, 2=300, 3=400
+#  set(SDxClockID "3" CACHE STRING "SDx clock ID")
+#  message(STATUS "zcu102 clock def in MHz: 0=100, 1=200, 2=300, 3=400")
+#  set(SDxArch "arm64")
+#elseif (${SDxPlatform} STREQUAL "zc706") 	#zc706 clock ID def (MHz): 0=166, 1=143, 2=100, 3=200
+#  set(SDxClockID "3" CACHE STRING "SDx clock ID")
+#  message(STATUS "zc706 clock def in MHz: 0=100, 1=200, 2=300, 3=400")
+#  set(SDxArch "arm32")
+#elseif (${SDxPlatform} STREQUAL "zc702") 	#zc702 clock ID def (MHz): 0=166, 1=143, 2=100, 3=200
+#  set(SDxClockID "3" CACHE STRING "SDx clock ID")
+#  message(STATUS "zc702 clock def in MHz:  0=166, 1=143, 2=100, 3=200")
+#  set(SDxArch "arm32")
+#else (${SDxPlatform} STREQUAL "zcu102")
+#  message(STATUS "non default platform, please also set SDx clock ID (default clock ID is 0) and SDx arch (default is 64 bit)")
+#  set(SDxClockID "0" CACHE STRING "SDx clock ID")
+#  set(SDxArch "arm64" CACHE STRING "SDx aarch")
+#endif (${SDxPlatform} STREQUAL "zcu102")
+
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_LIST_DIR})
+set(CMAKE_TRY_COMPILE_TARGET_TYPE "STATIC_LIBRARY" CACHE STRING "" FORCE)
+
+#find Vitis 
+find_package(Vitis REQUIRED)
+set(VitisRoot ${VITIS_ROOT})
+
+# give the system information
 SET (CMAKE_SYSTEM_NAME Linux)
 
 if (WIN32)
-  SET(SDxHostSystemName "nt")
+  SET(VitisHostSystemName "nt")
 else (WIN32)
-  SET(SDxHostSystemName "lin")
+  SET(VitisHostSystemName "lin")
 endif (WIN32)
 
-if (${SDxArch} STREQUAL "arm64") # 64 bit toolchain
-  #SET (CMAKE_FIND_ROOT_PATH ${XSDK_PARENT}/gnu/aarch64/${SDxHostSystemName}/aarch64-linux/aarch64-linux-gnu)
+if (${VitisArch} STREQUAL "arm64") # 64 bit toolchain
   SET (CMAKE_SYSTEM_PROCESSOR aarch64)
   SET (gnuPrefix1 aarch64-linux)
   SET (gnuPrefix2 aarch64-linux-gnu)
@@ -82,8 +83,7 @@ if (${SDxArch} STREQUAL "arm64") # 64 bit toolchain
 
   #extra compilation flags
   #NONE
-else (${SDxArch} STREQUAL "arm64") #32 bit toolchain
-  #SET (CMAKE_FIND_ROOT_PATH ${XSDK_PARENT}/gnu/aarch32/${SDxHostSystemName}/gcc-arm-linux-gnueabi/arm-linux-gnueabihf)
+else (${VitisArch} STREQUAL "arm64") #32 bit toolchain
   SET (CMAKE_SYSTEM_PROCESSOR arm)
   SET (gnuPrefix1 gcc-arm-linux-gnueabi)
   SET (gnuPrefix2 arm-linux-gnueabihf)
@@ -91,53 +91,36 @@ else (${SDxArch} STREQUAL "arm64") #32 bit toolchain
   
   #extra compilation flags
   SET (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -D__ARM_PCS_VFP")
-endif (${SDxArch} STREQUAL "arm64")
+endif (${VitisArch} STREQUAL "arm64")
 
 
-
-INCLUDE(CMakeForceCompiler)
 # specify the cross compiler
+set(CMAKE_C_COMPILER ${VitisRoot}/gnu/${gnuArch}/${VitisHostSystemName}/${gnuPrefix1}/bin/${gnuPrefix2}-gcc)
+set(CMAKE_CXX_COMPILER ${VitisRoot}/gnu/${gnuArch}/${VitisHostSystemName}/${gnuPrefix1}/bin/${gnuPrefix2}-g++)
+set(CMAKE_LINKER ${VitisRoot}/gnu/${gnuArch}/${VitisHostSystemName}/${gnuPrefix1}/bin/aarch64-linux-gnu-ld)
+set(CMAKE_AR  ${VitisRoot}/gnu/${gnuArch}/${VitisHostSystemName}/${gnuPrefix1}/bin/${gnuPrefix2}-ar CACHE FILEPATH "Archiver")
 
-CMAKE_FORCE_C_COMPILER(${XSDK_PARENT}/gnu/${gnuArch}/${SDxHostSystemName}/${gnuPrefix1}/bin/${gnuPrefix2}-gcc ARM_CC)
-CMAKE_FORCE_CXX_COMPILER(${XSDK_PARENT}/gnu/${gnuArch}/${SDxHostSystemName}/${gnuPrefix1}/bin/${gnuPrefix2}-g++ ARM_CXX)
-SET(CMAKE_AR  ${XSDK_PARENT}/gnu/${gnuArch}/${SDxHostSystemName}/${gnuPrefix1}/bin/${gnuPrefix2}-ar CACHE FILEPATH "Archiver")
-SET(CMAKE_FIND_ROOT_PATH ${XSDK_PARENT}/gnu/${gnuArch}/${SDxHostSystemName}/${gnuPrefix1}/${gnuPrefix2})
 
-#find sysroot first try the command line argument SDxSysroot, then try to find it as part of the platform or fall back to SDK for default SDx platforms 
-SET (SDxTestCommandLineSysroot ${SDxSysroot})
-UNSET (SDxSysroot CACHE)
-find_path(SDxSysroot "usr/include/stdlib.h" PATHS ${SDxTestCommandLineSysroot} PATH_SUFFIXES "" NO_DEFAULT_PATH)
-find_path(SDxSysroot "usr/include/stdlib.h" PATHS "${SDxPlatform}/sw/sysroot" PATH_SUFFIXES "" NO_DEFAULT_PATH)
-find_path(SDxSysroot "usr/include/stdlib.h" PATHS "${CMAKE_FIND_ROOT_PATH}/libc" PATH_SUFFIXES "" NO_DEFAULT_PATH)
-MESSAGE (STATUS "SDx sysroot: ${SDxSysroot}")
-#change OpenCV_DIR to cross compiled libraries in sysroot 
-SET (ENV{OpenCV_DIR} ${SDxSysroot}/usr)
-SET (ENV{OPENCV_DIR} ${SDxSysroot}/usr)
-SET (ENV{GSTREAMER_DIR} ${SDxSysroot}/usr)
+
+
+#find sysroot first try the command line argument VitisSysroot, then try to find it as part of the platform or fall back to SDK for default Vitis platforms 
+find_path(VitisSysrootAsFound "usr/include/stdlib.h" PATHS ${VitisSysroot} PATH_SUFFIXES "" NO_DEFAULT_PATH)
+find_path(VitisSysrootAsFound "usr/include/stdlib.h" PATHS "${VitisPlatform}/sw/sysroot" PATH_SUFFIXES "" NO_DEFAULT_PATH)
+find_path(VitisSysrootAsFound "usr/include/stdlib.h" PATHS "${CMAKE_FIND_ROOT_PATH}/libc" PATH_SUFFIXES "" NO_DEFAULT_PATH)
+MESSAGE ("Vitis sysroot: " ${VitisSysrootAsFound})
 
 # set up cross compilation paths
-SET (CMAKE_FIND_ROOT_PATH_MODE_PROGRAM NEVER)
+set(CMAKE_SYSROOT ${VitisSysrootAsFound})
+set(CMAKE_FIND_ROOT_PATH  ${VitisSysrootAsFound})
+#set(CMAKE_FIND_ROOT_PATH ${VitisRoot}/gnu/${gnuArch}/${VitisHostSystemName}/${gnuPrefix1}/${gnuPrefix2})
 SET (CMAKE_SKIP_BUILD_RPATH FALSE)
 SET (CMAKE_BUILD_WITH_INSTALL_RPATH TRUE)
-SET (CMAKE_INSTALL_RPATH ${SDxSysroot}/lib;${SDxSysroot}/usr/lib;${SDxSysroot}/lib/${gnuPrefix2};${SDxSysroot}/usr/lib/${gnuPrefix2})
-SET (CMAKE_LIBRARY_PATH ${SDxSysroot}/lib)
-set (CMAKE_INCLUDE_PATH ${SDxSysroot}/usr/)
-
-# Added includes for ultra96 build
-include_directories(
-  ${SDxSysroot}/usr/include/c++/7 
-  ${SDxSysroot}/usr/include/c++/7/${gnuPrefix2} 
-  ${SDxSysroot}/usr/include/c++/7/backward 
-  ${SDxSysroot}/usr/include
-  ${SDxSysroot}/usr/include/${gnuPrefix2}
-  )
-
-# to enable proper (2017.4 and before) native compilation for csim
-UNSET(CMAKE_CXX_FLAGS)
-SET (CMAKE_CXX_FLAGS "-DHLS_NO_XIL_FPO_LIB" CACHE STRING "" FORCE)
-
-# -rpath-link needed in 2018.2 reVISION sysroots
-SET (CMAKE_SHARED_LINKER_FLAGS "--sysroot=${SDxSysroot} -Wl,-rpath-link,${SDxSysroot}/lib:${SDxSysroot}/usr/lib:${SDxSysroot}/lib/${gnuPrefix2}:${SDxSysroot}/usr/lib/${gnuPrefix2}" CACHE STRING "" FORCE)
-
-SET (CMAKE_EXE_LINKER_FLAGS "--sysroot=${SDxSysroot} -Wl,-rpath-link,${SDxSysroot}/lib:${SDxSysroot}/usr/lib:${SDxSysroot}/lib/${gnuPrefix2}:${SDxSysroot}/usr/lib/${gnuPrefix2}" CACHE STRING "" FORCE)
-
+SET (CMAKE_INSTALL_RPATH ${VitisSysrootAsFound}/lib;${VitisSysrootAsFound}/usr/lib;${VitisSysrootAsFound}/lib/${gnuPrefix2};${VitisSysrootAsFound}/usr/lib/${gnuPrefix2})
+SET (CMAKE_LIBRARY_PATH ${VitisSysrootAsFound}/lib;${VitisSysrootAsFound}/usr/lib;${VitisSysrootAsFound}/lib/${gnuPrefix2};${VitisSysrootAsFound}/usr/lib/${gnuPrefix2})
+set (CMAKE_INCLUDE_PATH ${VitisSysrootAsFound}/usr/)
+# adjust the default behavior of the find commands:
+# search headers and libraries in the target environment
+set(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ONLY)
+set(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY)
+# search programs in the host environment
+set(CMAKE_FIND_ROOT_PATH_MODE_PROGRAM NEVER)
