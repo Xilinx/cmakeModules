@@ -67,14 +67,12 @@ if(NOT VITIS_XCHESS_MAKE)
 	message(STATUS "Unable to find xchessmk")
 else(NOT VITIS_XCHESS_MAKE)
 	message(STATUS "Found xchessmk:${VITIS_XCHESS_MAKE}")
+	get_filename_component(_bindir ${VITIS_XCHESS_MAKE} DIRECTORY)
+	get_filename_component(VITIS_AIETOOLS_DIR ${_bindir} DIRECTORY)
 endif(NOT VITIS_XCHESS_MAKE)
-
-get_filename_component(_bindir ${VITIS_XCHESS_MAKE} DIRECTORY)
-get_filename_component(VITIS_AIETOOLS_DIR ${_bindir} DIRECTORY)
 
 find_library(VITIS_LIBME me NO_DEFAULT_PATH CMAKE_FIND_ROOT_PATH_BOTH PATHS
 			${VITIS_AIETOOLS_DIR}/data/cervino/lib/Release)
-
 if(NOT VITIS_LIBME)
 	message(STATUS "Unable to find libme.a")
 else(NOT VITIS_LIBME)
