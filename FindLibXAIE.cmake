@@ -30,12 +30,14 @@
 #
 ###############################################################################
 
+#set(CMAKE_FIND_DEBUG_MODE 1)
+
 find_path(XILINX_XAIE_INCLUDE_DIR xaiengine.h
-  PATHS /include /opt/xaiengine/include
+  PATHS /include /usr/include /opt/xaiengine/include
 )
 
 find_library(XILINX_XAIE_LIBS xaiengine
-  PATHS /lib /opt/xaiengine/lib 
+  PATHS /lib /usr/lib /opt/xaiengine/lib 
 )
 get_filename_component(XILINX_XAIE_LIBS ${XILINX_XAIE_LIBS} REALPATH)
 
