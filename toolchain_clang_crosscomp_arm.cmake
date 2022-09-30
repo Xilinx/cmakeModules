@@ -70,16 +70,14 @@ endif (${Arch} STREQUAL "arm64")
 
 
 # specify the cross compiler
-set(CMAKE_FIND_ROOT_PATH_MODE_PACKAGE NEVER) #Make sure we look for clang on host
-#set(CLANG_VER 8)
-find_package(Clang REQUIRED)
-message(STATUS "Clang foud: " ${CLANG_INSTALL_PREFIX})
+# make sure clang is available 
+find_program(CLANG_CC clang REQUIRED)
 
-set(CMAKE_C_COMPILER ${CLANG_INSTALL_PREFIX}/bin/clang)
-set(CMAKE_CXX_COMPILER ${CLANG_INSTALL_PREFIX}/bin/clang++)
-set(CMAKE_ASM_COMPILER ${CLANG_INSTALL_PREFIX}/bin/clang)
-set(CMAKE_STRIP ${LLVM_INSTALL_PREFIX}/bin/llvm-strip)
-set(CLANG_LLD lld CACHE STRING "" FORCE)
+set(CMAKE_C_COMPILER clang)
+set(CMAKE_CXX_COMPILER clang++)
+set(CMAKE_ASM_COMPILER clang)
+set(CMAKE_STRIP llvm-strip)
+set(CLANG_LLD lld)
 
 set(CMAKE_C_FLAGS "-Wl,-z,notext --target=${gnuArch} -fuse-ld=lld -Wno-unused-command-line-argument" CACHE STRING "" FORCE)
 set(CMAKE_CXX_FLAGS "${CMAKE_C_FLAGS}" CACHE STRING "" FORCE)
