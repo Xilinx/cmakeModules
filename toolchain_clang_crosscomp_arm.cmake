@@ -30,52 +30,72 @@
 #
 ###############################################################################
 
-#     Author: Kristof Denolf <kristof@xilinx.com>
+#     Author: Kristof Denolf <kristof.denolf@amd.com>
+#             Stephen Neuendorffer <stephen.neuendorffer@amd.com>
 #     Date:   2018/9/23
 
-# cmake -DCMAKE_TOOLCHAIN_FILE=toolchain_crosscomp_arm_acdc.cmake ..
-#  -DACDCSysrootSysroot="absolute path to the sysroot folder"
+# cmake -DCMAKE_TOOLCHAIN_FILE=toolchain_vitis_crosscomp_arm.cmake ..
+#  -DArch="arm32 or arm64"
+#  -DSysroot="absolute path to the sysroot folder"
+
+set(Arch "arm64" CACHE STRING "ARM arch: arm64 or arm32")
+
+
+list(APPEND CMAKE_TRY_COMPILE_PLATFORM_VARIABLES Sysroot Arch)
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_LIST_DIR})
 
-#set(ACDCSysroot /group/xrlabs/platforms/pynq_on_versal_vck190_hacked/vck190-sysroot CACHE STRING "" FORCE)
-#set(ACDCSysroot /group/xrlabs/platforms/pynq-vck190-sysroot CACHE STRING "" FORCE)
-set(ACDCSysroot /group/xrlabs2/platforms/vck190_air_prod_2021.2_sysroot CACHE STRING "" FORCE)
-#set(ACDCSysroot /group/xrlabs/platforms/pynq-vck190-py37-sysroot CACHE STRING "" FORCE)
-
 #include(toolchain_crosscomp_arm)
-
-
 # give the system information
 SET (CMAKE_SYSTEM_NAME Linux)
-SET (CMAKE_SYSTEM_PROCESSOR aarch64)
+
+if (${Arch} STREQUAL "arm64") # 64 bit toolchain
+  SET (CMAKE_SYSTEM_PROCESSOR aarch64)
+  SET (gnuPrefix1 aarch64-linux)
+  SET (gnuPrefix2 aarch64-linux-gnu)
+  SET (gnuArch aarch64-linux-gnu)
+  SET (sysrootPrefix aarch64-xilinx-linux)
+  #extra compilation flags
+  #NONE
+else (${Arch} STREQUAL "arm64") #32 bit toolchain
+  SET (CMAKE_SYSTEM_PROCESSOR arm)
+  SET (gnuPrefix1 gcc-arm-linux-gnueabi)
+  SET (gnuPrefix2 arm-linux-gnueabihf)
+  SET (gnuArch aarch32)
+  SET (sysrootPrefix cortexa9t2hf-neon-xilinx-linux-gnueabi)
+  #extra compilation flags
+  SET (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -D__ARM_PCS_VFP")
+
+endif (${Arch} STREQUAL "arm64")
 
 
 # specify the cross compiler
-set(CLANG_VER 8)
-set(CMAKE_C_COMPILER clang-${CLANG_VER})
-set(CMAKE_CXX_COMPILER clang++-${CLANG_VER})
-set(CMAKE_ASM_COMPILER clang-${CLANG_VER})
-set(CMAKE_STRIP llvm-strip)
+set(CMAKE_FIND_ROOT_PATH_MODE_PACKAGE NEVER) #Make sure we look for clang on host
+#set(CLANG_VER 8)
+find_package(Clang REQUIRED)
+message(STATUS "Clang foud: " ${CLANG_INSTALL_PREFIX})
+
+set(CMAKE_C_COMPILER ${CLANG_INSTALL_PREFIX}/bin/clang)
+set(CMAKE_CXX_COMPILER ${CLANG_INSTALL_PREFIX}/bin/clang++)
+set(CMAKE_ASM_COMPILER ${CLANG_INSTALL_PREFIX}/bin/clang)
+set(CMAKE_STRIP ${LLVM_INSTALL_PREFIX}/bin/llvm-strip)
 set(CLANG_LLD lld CACHE STRING "" FORCE)
 
-#set(CMAKE_SHARED_LINKER_FLAGS "-Wl,-z,notext -fuse-ld=lld -L${ACDCSysroot}/usr/lib/gcc/aarch64-linux-gnu/7" CACHE STRING "" FORCE)
-#set(CMAKE_EXE_LINKER_FLAGS "-Wl,-z,notext -fuse-ld=lld -L${ACDCSysroot}/usr/lib/gcc/aarch64-linux-gnu/7" CACHE STRING "" FORCE)
-set(CMAKE_SHARED_LINKER_FLAGS "-Wl,-z,notext -fuse-ld=lld -Wl,-rpath-link=${ACDCSysroot}/usr/lib/gcc/aarch64-linux-gnu/7" CACHE STRING "" FORCE)
-set(CMAKE_EXE_LINKER_FLAGS "-Wl,-z,notext -fuse-ld=lld -Wl,-rpath-link=${ACDCSysroot}/usr/lib/gcc/aarch64-linux-gnu/7" CACHE STRING "" FORCE)
-set(CMAKE_C_FLAGS "-Wl,-z,notext --sysroot=${ACDCSysroot} --target=aarch64-linux-gnu -fuse-ld=lld -Wno-unused-command-line-argument" CACHE STRING "" FORCE)
+#set(CMAKE_SHARED_LINKER_FLAGS "-Wl,-z,notext -fuse-ld=lld -Wl,-rpath-link=${Sysroot}/usr/lib/gcc/aarch64-linux-gnu/7" CACHE STRING "" FORCE)
+#set(CMAKE_EXE_LINKER_FLAGS "-Wl,-z,notext -fuse-ld=lld -Wl,-rpath-link=${Sysroot}/usr/lib/gcc/aarch64-linux-gnu/7" CACHE STRING "" FORCE)
+set(CMAKE_C_FLAGS "-Wl,-z,notext --target=${gnuArch} -fuse-ld=lld -Wno-unused-command-line-argument" CACHE STRING "" FORCE)
 set(CMAKE_CXX_FLAGS "${CMAKE_C_FLAGS}" CACHE STRING "" FORCE)
 set(CMAKE_ASM_FLAGS "${CMAKE_C_FLAGS}" CACHE STRING "" FORCE)
 
 # set up cross compilation paths
-set(CMAKE_SYSROOT ${ACDCSysroot})
-set(CMAKE_FIND_ROOT_PATH  ${ACDCSysroot})
+set(CMAKE_SYSROOT ${Sysroot})
+set(CMAKE_FIND_ROOT_PATH  ${Sysroot})
 set(CMAKE_SKIP_BUILD_RPATH FALSE)
 set(CMAKE_BUILD_WITH_INSTALL_RPATH TRUE)
 # Ensure that we build relocatable binaries
-set(CMAKE_INSTALL_RPATH $ORIGIN/../lib/)
-set(CMAKE_LIBRARY_PATH ${ACDCSysroot}/usr/lib)
-set(CMAKE_INCLUDE_PATH ${ACDCSysroot}/usr/)
+set(CMAKE_INSTALL_RPATH $ORIGIN)
+set(CMAKE_LIBRARY_PATH ${Sysroot}/usr/lib)
+set(CMAKE_INCLUDE_PATH ${Sysroot}/usr/)
 # adjust the default behavior of the find commands:
 # search headers and libraries in the target environment
 set(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ONLY)
@@ -83,33 +103,3 @@ set(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY)
 set(CMAKE_FIND_ROOT_PATH_MODE_PACKAGE ONLY)
 # search programs in the host environment
 set(CMAKE_FIND_ROOT_PATH_MODE_PROGRAM NEVER)
-
-# set ACDC specifics for a cross compilation
-set(CMAKE_BUILD_TYPE MinSizeRel CACHE STRING "build type" FORCE)
-# peano
-set(LLVM_TARGETS_TO_BUILD "ARM;AArch64;" CACHE STRING "Semicolon-separated list of LLVM targets" FORCE)
-set(MLIR_BINDINGS_PYTHON_ENABLED ON CACHE BOOL "" FORCE)
-set(CMAKE_C_IMPLICIT_LINK_LIBRARIES gcc_s CACHE STRING "" FORCE) 
-set(CMAKE_CXX_IMPLICIT_LINK_LIBRARIES gcc_s CACHE STRING "" FORCE)
-set(LLVM_ENABLE_PIC True CACHE BOOL "" FORCE)
-set(MLIR_BUILD_UTILS ON CACHE BOOL "" FORCE)
-set(MLIR_INCLUDE_TESTS ON CACHE BOOL "" FORCE)
-set(MLIR_INCLUDE_INTEGRATION_TESTS OFF CACHE BOOL "" FORCE)
-set(LINKER_SUPPORTS_COLOR_DIAGNOSTICS OFF CACHE BOOL "" FORCE)
-set(LLVM_ENABLE_TERMINFO OFF CACHE BOOL "" FORCE)
-set(LLVM_DEFAULT_TARGET_TRIPLE aarch64-linux-gnu CACHE STRING "" FORCE)
-set(LLVM_TARGET_ARCH AArch64 CACHE STRING "" FORCE)
-set(LLVM_ENABLE_ASSERTIONS ON CACHE BOOL "" FORCE)
-
-# # Python
-# We have to explicitly set this extension.  Normally it would be determined by FindPython3, but
-# it's inference mechanism doesn't work when cross-compiling
-set(PYTHON_MODULE_EXTENSION ".cpython-38-aarch64-linux-gnu.so")
-set(Python3_ROOT_DIR ${ACDCSysroot}/bin)
-
-set(Python_ROOT ${ACDCSysroot}/usr/local/lib/python3.8/dist-packages)
-set(Python3_NumPy_INCLUDE_DIR ${Python_ROOT}/numpy/ CACHE STRING "" FORCE)
-# set(Python3_INCLUDE_DIR ${ACDCSysroot}/usr/include/python3.6m CACHE STRING "" FORCE)
-# set(Python3_LIBRARY ${ACDCSysroot}/usr/lib/aarch64-linux-gnu/libpython3.6m.so CACHE STRING "" FORCE)
-set(pybind11_DIR ${Python_ROOT}/pybind11/share/cmake/pybind11 CACHE STRING "" FORCE)
-set(Torch_DIR ${Python_ROOT}/torch/share/cmake/Torch CACHE STRING "" FORCE)

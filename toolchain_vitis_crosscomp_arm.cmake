@@ -35,7 +35,7 @@
 #     Date:   2022/09/28
 #     NOTE: Currenlty only Vitis default sysroot tested and supported
 
-# cmake -DCMAKE_TOOLCHAIN_FILE=toolchain_crosscomp_arm.cmake ..
+# cmake -DCMAKE_TOOLCHAIN_FILE=toolchain_vitis_crosscomp_arm.cmake ..
 #  -DVitisArch="arm32 or arm64"
 #  -DVitisSysroot="absolute path to the sysroot folder"
 
@@ -96,14 +96,16 @@ MESSAGE ("Vitis sysroot: " ${VitisSysrootAsFound})
 # set up cross compilation paths
 set(CMAKE_SYSROOT ${VitisSysrootAsFound})
 set(CMAKE_FIND_ROOT_PATH ${VitisSysrootAsFound})
-SET (CMAKE_SKIP_BUILD_RPATH FALSE)
-SET (CMAKE_BUILD_WITH_INSTALL_RPATH TRUE)
-SET (CMAKE_INSTALL_RPATH ${VitisSysrootAsFound}/usr/lib;${VitisSysrootAsFound}/lib${VitisSysrootAsFound}/lib/${gnuPrefix2};${VitisSysrootAsFound}/usr/lib/${gnuPrefix2})
-SET (CMAKE_LIBRARY_PATH ${VitisSysrootAsFound}/lib;${VitisSysrootAsFound}/usr/lib;${VitisSysrootAsFound}/lib/${gnuPrefix2};${VitisSysrootAsFound}/usr/lib/${gnuPrefix2})
-set (CMAKE_INCLUDE_PATH ${VitisSysrootAsFound}/usr/)
+set(CMAKE_SKIP_BUILD_RPATH FALSE)
+set(CMAKE_BUILD_WITH_INSTALL_RPATH TRUE)
+set(CMAKE_INSTALL_RPATH $ORIGIN)
+set(CMAKE_LIBRARY_PATH ${VitisSysrootAsFound}/usr/lib)
+set(CMAKE_INCLUDE_PATH ${VitisSysrootAsFound}/usr/)
+
 # adjust the default behavior of the find commands:
 # search headers and libraries in the target environment
 set(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ONLY)
 set(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY)
+set(CMAKE_FIND_ROOT_PATH_MODE_PACKAGE ONLY)
 # search programs in the host environment
 set(CMAKE_FIND_ROOT_PATH_MODE_PROGRAM NEVER)
