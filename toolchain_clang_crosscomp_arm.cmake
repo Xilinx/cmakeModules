@@ -81,15 +81,13 @@ set(CMAKE_ASM_COMPILER ${CLANG_INSTALL_PREFIX}/bin/clang)
 set(CMAKE_STRIP ${LLVM_INSTALL_PREFIX}/bin/llvm-strip)
 set(CLANG_LLD lld CACHE STRING "" FORCE)
 
-#set(CMAKE_SHARED_LINKER_FLAGS "-Wl,-z,notext -fuse-ld=lld -Wl,-rpath-link=${Sysroot}/usr/lib/gcc/aarch64-linux-gnu/7" CACHE STRING "" FORCE)
-#set(CMAKE_EXE_LINKER_FLAGS "-Wl,-z,notext -fuse-ld=lld -Wl,-rpath-link=${Sysroot}/usr/lib/gcc/aarch64-linux-gnu/7" CACHE STRING "" FORCE)
 set(CMAKE_C_FLAGS "-Wl,-z,notext --target=${gnuArch} -fuse-ld=lld -Wno-unused-command-line-argument" CACHE STRING "" FORCE)
 set(CMAKE_CXX_FLAGS "${CMAKE_C_FLAGS}" CACHE STRING "" FORCE)
 set(CMAKE_ASM_FLAGS "${CMAKE_C_FLAGS}" CACHE STRING "" FORCE)
 
 # set up cross compilation paths
 set(CMAKE_SYSROOT ${Sysroot})
-set(CMAKE_FIND_ROOT_PATH  ${Sysroot})
+set(CMAKE_FIND_ROOT_PATH ${Sysroot})
 set(CMAKE_SKIP_BUILD_RPATH FALSE)
 set(CMAKE_BUILD_WITH_INSTALL_RPATH TRUE)
 # Ensure that we build relocatable binaries
@@ -103,3 +101,6 @@ set(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY)
 set(CMAKE_FIND_ROOT_PATH_MODE_PACKAGE ONLY)
 # search programs in the host environment
 set(CMAKE_FIND_ROOT_PATH_MODE_PROGRAM NEVER)
+
+#set(CMAKE_SHARED_LINKER_FLAGS "-Wl,-z,notext -fuse-ld=lld -Wl,-rpath-link=${Sysroot}/usr/lib/${sysrootPrefix}/11.2.0" CACHE STRING "" FORCE)
+#set(CMAKE_EXE_LINKER_FLAGS "-Wl,-z,notext -fuse-ld=lld -Wl,-rpath-link=${Sysroot}/usr/lib/${sysrootPrefix}/11.2.0" CACHE STRING "" FORCE)
