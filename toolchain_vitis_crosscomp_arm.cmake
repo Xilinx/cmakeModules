@@ -33,6 +33,7 @@
 #     Authors: Kristof Denolf <kristof@xilinx.com> 
 #              Alireza Khodamoradi <alirezak@xilinx.com>
 #     Date:   2022/09/28
+#     NOTE: Currenlty only Vitis default sysroot tested and supported
 
 # cmake -DCMAKE_TOOLCHAIN_FILE=toolchain_crosscomp_arm.cmake ..
 #  -DVitisArch="arm32 or arm64"
