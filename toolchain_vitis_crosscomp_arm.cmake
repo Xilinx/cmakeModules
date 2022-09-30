@@ -98,10 +98,10 @@ set(CMAKE_SYSROOT ${VitisSysrootAsFound})
 set(CMAKE_FIND_ROOT_PATH ${VitisSysrootAsFound})
 set(CMAKE_SKIP_BUILD_RPATH FALSE)
 set(CMAKE_BUILD_WITH_INSTALL_RPATH TRUE)
+# Ensure that we build relocatable binaries
 set(CMAKE_INSTALL_RPATH $ORIGIN)
 set(CMAKE_LIBRARY_PATH ${VitisSysrootAsFound}/usr/lib)
 set(CMAKE_INCLUDE_PATH ${VitisSysrootAsFound}/usr/)
-
 # adjust the default behavior of the find commands:
 # search headers and libraries in the target environment
 set(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ONLY)
