@@ -93,17 +93,12 @@ find_path(VitisSysrootAsFound "usr/include/stdlib.h" PATHS "${CMAKE_FIND_ROOT_PA
 MESSAGE ("Vitis sysroot: " ${VitisSysrootAsFound})
 
 # set up cross compilation paths
-set(TEST_ORIGIN $ORIGIN/../lib/)
-message("ORIGIN: " ${TEST_ORIGIN})
 set(CMAKE_SYSROOT ${VitisSysrootAsFound})
 set(CMAKE_FIND_ROOT_PATH ${VitisSysrootAsFound})
-#set(CMAKE_FIND_ROOT_PATH ${VitisRoot}/gnu/${gnuArch}/${VitisHostSystemName}/${gnuPrefix1}/${gnuPrefix2})
 SET (CMAKE_SKIP_BUILD_RPATH FALSE)
 SET (CMAKE_BUILD_WITH_INSTALL_RPATH TRUE)
-#SET (CMAKE_INSTALL_RPATH ${VitisSysrootAsFound}/usr/lib;${VitisSysrootAsFound}/lib${VitisSysrootAsFound}/lib/${gnuPrefix2};${VitisSysrootAsFound}/usr/lib/${gnuPrefix2})
-#SET (CMAKE_LIBRARY_PATH ${VitisSysrootAsFound}/lib;${VitisSysrootAsFound}/usr/lib;${VitisSysrootAsFound}/lib/${gnuPrefix2};${VitisSysrootAsFound}/usr/lib/${gnuPrefix2})
-SET (CMAKE_INSTALL_RPATH ${VitisSysrootAsFound}/lib/${gnuPrefix2};${VitisSysrootAsFound}/usr/lib/${gnuPrefix2})
-SET (CMAKE_LIBRARY_PATH ${VitisSysrootAsFound}/lib/${gnuPrefix2};${VitisSysrootAsFound}/usr/lib/${gnuPrefix2})
+SET (CMAKE_INSTALL_RPATH ${VitisSysrootAsFound}/usr/lib;${VitisSysrootAsFound}/lib${VitisSysrootAsFound}/lib/${gnuPrefix2};${VitisSysrootAsFound}/usr/lib/${gnuPrefix2})
+SET (CMAKE_LIBRARY_PATH ${VitisSysrootAsFound}/lib;${VitisSysrootAsFound}/usr/lib;${VitisSysrootAsFound}/lib/${gnuPrefix2};${VitisSysrootAsFound}/usr/lib/${gnuPrefix2})
 set (CMAKE_INCLUDE_PATH ${VitisSysrootAsFound}/usr/)
 # adjust the default behavior of the find commands:
 # search headers and libraries in the target environment
@@ -111,7 +106,3 @@ set(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ONLY)
 set(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY)
 # search programs in the host environment
 set(CMAKE_FIND_ROOT_PATH_MODE_PROGRAM NEVER)
-
-# -rpath-link needed in 2018.2 reVISION sysroots
-#SET (CMAKE_SHARED_LINKER_FLAGS "--sysroot=${VitisSysrootAsFound} -Wl,-rpath-link,${VitisSysrootAsFound}/lib:${VitisSysrootAsFound}/usr/lib:${VitisSysrootAsFound}/lib/${gnuPrefix2}:${VitisSysrootAsFound}/usr/lib/${gnuPrefix2}" CACHE STRING "" FORCE)
-#SET (CMAKE_EXE_LINKER_FLAGS "--sysroot=${VitisSysrootAsFound} -Wl,-rpath-link,${VitisSysrootAsFound}/lib:${VitisSysrootAsFound}/usr/lib:${VitisSysrootAsFound}/lib/${gnuPrefix2}:${VitisSysrootAsFound}/usr/lib/${gnuPrefix2}" CACHE STRING "" FORCE)
