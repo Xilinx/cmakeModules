@@ -74,12 +74,14 @@ endif (${Arch} STREQUAL "arm64")
 find_program(CLANG_CC clang REQUIRED)
 
 set(CMAKE_C_COMPILER clang)
+set(CMAKE_C_COMPILER_TARGET ${gnuArch})
 set(CMAKE_CXX_COMPILER clang++)
+set(CMAKE_CXX_COMPILER_TARGET ${gnuArch})
 set(CMAKE_ASM_COMPILER clang)
 set(CMAKE_STRIP llvm-strip)
 set(CLANG_LLD lld)
 
-set(CMAKE_C_FLAGS "-Wl,-z,notext --target=${gnuArch} -fuse-ld=lld -Wno-unused-command-line-argument" CACHE STRING "" FORCE)
+set(CMAKE_C_FLAGS "-Wl,-z,notext -fuse-ld=lld -Wno-unused-command-line-argument" CACHE STRING "" FORCE)
 set(CMAKE_CXX_FLAGS "${CMAKE_C_FLAGS}" CACHE STRING "" FORCE)
 set(CMAKE_ASM_FLAGS "${CMAKE_C_FLAGS}" CACHE STRING "" FORCE)
 
