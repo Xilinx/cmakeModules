@@ -81,7 +81,7 @@ set(CMAKE_ASM_COMPILER clang)
 set(CMAKE_STRIP llvm-strip)
 set(CLANG_LLD lld)
 
-set(CMAKE_C_FLAGS "-Wl,-z,notext -fuse-ld=lld -Wno-unused-command-line-argument" CACHE STRING "" FORCE)
+#set(CMAKE_C_FLAGS "-fuse-ld=lld -Wl,-z,notext -Wno-unused-command-line-argument" CACHE STRING "" FORCE)
 set(CMAKE_CXX_FLAGS "${CMAKE_C_FLAGS}" CACHE STRING "" FORCE)
 set(CMAKE_ASM_FLAGS "${CMAKE_C_FLAGS}" CACHE STRING "" FORCE)
 
@@ -91,7 +91,7 @@ set(CMAKE_FIND_ROOT_PATH ${Sysroot})
 set(CMAKE_SKIP_BUILD_RPATH FALSE)
 set(CMAKE_BUILD_WITH_INSTALL_RPATH TRUE)
 # Ensure that we build relocatable binaries
-set(CMAKE_INSTALL_RPATH $ORIGIN)
+set(CMAKE_INSTALL_RPATH $ORIGIN) #set(CMAKE_INSTALL_RPATH ${Sysroot}/usr/lib/${sysrootPrefix}/11.2.0)
 set(CMAKE_LIBRARY_PATH ${Sysroot}/usr/lib)
 set(CMAKE_INCLUDE_PATH ${Sysroot}/usr/)
 # adjust the default behavior of the find commands:
@@ -102,5 +102,6 @@ set(CMAKE_FIND_ROOT_PATH_MODE_PACKAGE ONLY)
 # search programs in the host environment
 set(CMAKE_FIND_ROOT_PATH_MODE_PROGRAM NEVER)
 
-#set(CMAKE_SHARED_LINKER_FLAGS "-Wl,-z,notext -fuse-ld=lld -Wl,-rpath-link=${Sysroot}/usr/lib/${sysrootPrefix}/11.2.0" CACHE STRING "" FORCE)
-#set(CMAKE_EXE_LINKER_FLAGS "-Wl,-z,notext -fuse-ld=lld -Wl,-rpath-link=${Sysroot}/usr/lib/${sysrootPrefix}/11.2.0" CACHE STRING "" FORCE)
+# Vitis/PetaLinux sysroot specific 
+set(CMAKE_EXE_LINKER_FLAGS "-Wl,-z,notext -fuse-ld=lld -B ${Sysroot}/usr/lib/${sysrootPrefix}/11.2.0 -L ${Sysroot}/usr/lib/${sysrootPrefix}/11.2.0" CACHE STRING "" FORCE)
+link_directories(${Sysroot}/usr/lib/${sysrootPrefix}/11.2.0)
