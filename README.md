@@ -4,17 +4,19 @@ This repository contains helpful CMake modules for a variety of Xilinx build flo
 
 ## Current release
 
-The current release is meant to be used with the [Xilinx Vitis 2020.1 tools](https://www.xilinx.com/products/design-tools/vitis/vitis-platform.html).
+The current release is meant to be used with the [Xilinx Vitis 2022.1 tools](https://www.xilinx.com/products/design-tools/vitis/vitis-platform.html).
 
-## Older release tags
+There are two main toolchains:
 
-The older 2018.2 and 2018.3 tag has SDx compatible modules for cross-compiling designs for SDx (specifically, the SDSoC toolflow within SDx). Toolchain files are available for cross-compiling to target ARM code (toolchain_crosscomp_arm.cmake) or FPGA hw/sw designs via SDx/ SDSoC build flow (toolchain_sds.cmake). Additional support modules are useful to ensure the proper Xilinx build tools are present (e.g. FindVivadoHLS.cmake). 
+(1) Vitis cross compiler toolchain (toolchain_vitis_crosscomp_arm.cmake)
 
-An example is shown below for how to use the toolchain file when running CMake build to target FPGA hw/sw designs (SDx/SDSoC build flow). 
-   ```bash
-   $cmake .. -DCMAKE_TOOLCHAIN_FILE=<path to cmakeModules>/toolchain_sds.cmake
-   ```
+(2) Clang cross compiler toolchain (toolchain_clang_crosscomp_arm.cmake)
 
-More examples can be found in the PYNQ-ComputerVision repo as described here: http://github.com/Xilinx/PYNQ-ComputerVision/blob/master/overlays/README.md.
+The toolchains are invoked as most standard toolchains but with two additionally defined parameters (Arch, Sysroot).
 
-Additional CMake build flows will be added to this repository, in particular support for future Xilinx flows that support OpenCL/ SDAccel and later tools.
+```bash
+$cmake .. -DCMAKE_TOOLCHAIN_FILE=<path to cmakeModules>/<target toolchain file> -DArch=<arm32|arm64> -DSysroot=<absoluate path to sysroot folder>
+```
+In both cases, the sysroot folder can be the default Vitis sysroot, a Petalinux generated sysroot or a standard Ubuntu-based sysroot like those built by PYNQ. In the case when you're working with more custom sysroots like Vitis or Petalinux, you should use the toolchain `toolchain_clang_crosscomp_arm_petalinux.cmake` which provides additional guidance to find the necessary libraries. Note that this file may need to be edited depending if you're using 2022.1 or an older tool version. See the `toolchain_clang_crosscomp_arm_petalinux.cmake` header for more information.
+
+

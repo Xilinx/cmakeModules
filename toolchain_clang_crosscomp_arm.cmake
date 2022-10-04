@@ -40,6 +40,7 @@
 
 set(Arch "arm64" CACHE STRING "ARM arch: arm64 or arm32")
 
+message("toolchain_clang_crosscomp_arm.cmake")
 
 list(APPEND CMAKE_TRY_COMPILE_PLATFORM_VARIABLES Sysroot Arch)
 
@@ -103,5 +104,5 @@ set(CMAKE_FIND_ROOT_PATH_MODE_PACKAGE ONLY)
 set(CMAKE_FIND_ROOT_PATH_MODE_PROGRAM NEVER)
 
 # Vitis/PetaLinux sysroot specific 
-set(CMAKE_EXE_LINKER_FLAGS "-Wl,-z,notext -fuse-ld=lld -B ${Sysroot}/usr/lib/${sysrootPrefix}/11.2.0 -L ${Sysroot}/usr/lib/${sysrootPrefix}/11.2.0" CACHE STRING "" FORCE)
-link_directories(${Sysroot}/usr/lib/${sysrootPrefix}/11.2.0)
+#set(CMAKE_EXE_LINKER_FLAGS "-Wl,-z,notext -fuse-ld=lld -B ${Sysroot}/usr/lib/${sysrootPrefix}/11.2.0 -L ${Sysroot}/usr/lib/${sysrootPrefix}/11.2.0" CACHE STRING "" FORCE)
+#link_directories(${Sysroot}/usr/lib/${sysrootPrefix}/11.2.0)
