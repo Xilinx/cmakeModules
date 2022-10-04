@@ -45,11 +45,12 @@
 # ${Sysroot}/usr/lib/${sysrootPrefix}/${gccVer} changes signficiantly,
 # you may need to modify it entirely.
 
-#set(gccVer "10.2.0") # 2021.2
-set(gccVer "11.2.0") # 2022.1
+# NOTE: earlier version of Vitis sysroot refrence earlier gcc, e.g. 10.2.0 for 2021.2
+set(gccVer "11.2.0" CACHE STRING "gcc version used in sysroot") # 2022.1
+list(APPEND CMAKE_TRY_COMPILE_PLATFORM_VARIABLES gccVer)
 
 include(toolchain_clang_crosscomp_arm)
 
 # Vitis/PetaLinux sysroot specific 
 set(CMAKE_EXE_LINKER_FLAGS "-Wl,-z,notext -fuse-ld=lld -B ${Sysroot}/usr/lib/${sysrootPrefix}/${gccVer} -L ${Sysroot}/usr/lib/${sysrootPrefix}/${gccVer}" CACHE STRING "" FORCE)
-link_directories(${Sysroot}/usr/lib/${sysrootPrefix}/$CACHE{gccVer})
+link_directories(${Sysroot}/usr/lib/${sysrootPrefix}/${gccVer})
