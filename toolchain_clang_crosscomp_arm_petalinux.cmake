@@ -38,10 +38,7 @@
 #  -DArch="arm32 or arm64"
 #  -DSysroot="absolute path to the sysroot folder"
 
-# NOTE: It might be nice to pass gccVer as a command-line option (-DgccVer)
-# but this conflicts with the cmake test build as the variable is not passed
-# to the test build. Hence, please change the variable in this file if 
-# you're targeting a new gcc version. In fact, if the directory 
+# NOTE: If the directory 
 # ${Sysroot}/usr/lib/${sysrootPrefix}/${gccVer} changes signficiantly,
 # you may need to modify it entirely.
 
@@ -52,5 +49,23 @@ list(APPEND CMAKE_TRY_COMPILE_PLATFORM_VARIABLES gccVer)
 include(toolchain_clang_crosscomp_arm)
 
 # Vitis/PetaLinux sysroot specific 
-set(CMAKE_EXE_LINKER_FLAGS "-Wl,-z,notext -fuse-ld=lld -B ${Sysroot}/usr/lib/${sysrootPrefix}/${gccVer} -L ${Sysroot}/usr/lib/${sysrootPrefix}/${gccVer}" CACHE STRING "" FORCE)
-link_directories(${Sysroot}/usr/lib/${sysrootPrefix}/${gccVer})
+#set(CMAKE_C_FLAGS "-I${Sysroot}/usr/include/c++/${gccVer} -I${Sysroot}/usr/include/c++/${gccVer}/${sysrootPrefix} -B ${Sysroot}/usr/lib/${sysrootPrefix}/${gccVer} -Wl,-rpath-link=${Sysroot}/usr/lib/${sysrootPrefix}/${gccVer} -L${Sysroot}/usr/lib/${sysrootPrefix}/${gccVer}" CACHE STRING "" FORCE)
+#set(CMAKE_C_FLAGS "-Wl,-z,notext --sysroot=${Sysroot} --target=aarch64-linux-gnu -fuse-ld=lld -Wno-unused-command-line-argument" CACHE STRING "" FORCE)
+
+#set(CMAKE_C_FLAGS "-Wl,-z,notext -I${Sysroot}/usr/include/c++/${gccVer} -I${Sysroot}/usr/include/c++/${gccVer}/${sysrootPrefix} -B ${Sysroot}/usr/lib/${sysrootPrefix}/${gccVer} -Wl,-rpath-link=${Sysroot}/usr/lib/${sysrootPrefix}/${gccVer} -fuse-ld=lld -L${Sysroot}/usr/lib/${sysrootPrefix}/${gccVer}" CACHE STRING "" FORCE)
+
+set(CMAKE_C_FLAGS "-Wl,-z,notext -I${Sysroot}/usr/include/c++/${gccVer} -I${Sysroot}/usr/include/c++/${gccVer}/${sysrootPrefix} -B ${Sysroot}/usr/lib/${sysrootPrefix}/${gccVer} -Wl,-rpath-link=${Sysroot}/usr/lib/${sysrootPrefix}/${gccVer} --target=${gnuArch} -fuse-ld=lld -Wno-unused-command-line-argument -L${Sysroot}/usr/lib/${sysrootPrefix}/${gccVer}" CACHE STRING "" FORCE)
+
+# TODO: Does this need -L?
+set(CMAKE_SHARED_LINKER_FLAGS "-Wl,-z,notext -fuse-ld=lld -B ${Sysroot}/usr/lib/${sysrootPrefix}/${gccVer} -L${Sysroot}/usr/lib/${sysrootPrefix}/${gccVer}" CACHE STRING "" FORCE)
+
+# TODO: Does this need -L?
+set(CMAKE_EXE_LINKER_FLAGS "-Wl,-z,notext -fuse-ld=lld -B ${Sysroot}/usr/lib/${sysrootPrefix}/${gccVer} -L${Sysroot}/usr/lib/${sysrootPrefix}/${gccVer}" CACHE STRING "" FORCE)
+
+#set(CMAKE_C_IMPLICIT_LINK_LIBRARIES gcc_s CACHE STRING "" FORCE) 
+#set(CMAKE_CXX_IMPLICIT_LINK_LIBRARIES gcc_s CACHE STRING "" FORCE)
+
+# TODO: these need to be redeclared here since CMAKE_C_FLAGS is defeind later?
+#set(CMAKE_CXX_FLAGS "${CMAKE_C_FLAGS}" CACHE STRING "" FORCE) 
+#set(CMAKE_ASM_FLAGS "${CMAKE_C_FLAGS}" CACHE STRING "" FORCE)
+

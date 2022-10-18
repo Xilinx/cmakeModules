@@ -40,7 +40,7 @@
 
 set(Arch "arm64" CACHE STRING "ARM arch: arm64 or arm32")
 
-message("toolchain_clang_crosscomp_arm.cmake")
+#message("toolchain_clang_crosscomp_arm.cmake")
 
 list(APPEND CMAKE_TRY_COMPILE_PLATFORM_VARIABLES Sysroot Arch)
 
@@ -102,6 +102,11 @@ set(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY)
 set(CMAKE_FIND_ROOT_PATH_MODE_PACKAGE ONLY)
 # search programs in the host environment
 set(CMAKE_FIND_ROOT_PATH_MODE_PROGRAM NEVER)
+
+# needed so clang references the right libstdc++
+#set(GCC_INSTALL_PREFIX /tools/batonroot/rodin/devkits/lnx64/gcc-8.3.0/ CACHE STRING "" FORCE)
+find_path(gcc_path "gcc")
+set(GCC_INSTALL_PREFIX ${gcc_path}/.. CACHE STRING "" FORCE)
 
 # Vitis/PetaLinux sysroot specific 
 #set(CMAKE_EXE_LINKER_FLAGS "-Wl,-z,notext -fuse-ld=lld -B ${Sysroot}/usr/lib/${sysrootPrefix}/11.2.0 -L ${Sysroot}/usr/lib/${sysrootPrefix}/11.2.0" CACHE STRING "" FORCE)
