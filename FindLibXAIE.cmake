@@ -32,15 +32,19 @@
 
 #set(CMAKE_FIND_DEBUG_MODE 1)
 
-find_path(XILINX_XAIE_INCLUDE_DIR xaiengine.h
-  PATHS /include /usr/include /opt/xaiengine/include ${LibXAIE_DIR}/include
-)
-
 find_library(XILINX_XAIE_LIBS xaiengine
-  PATHS /lib /usr/lib /opt/xaiengine/lib ${LibXAIE_DIR}/lib
+  PATHS /lib /usr/lib /opt/xaiengine/lib /opt/xaienginev2/lib ${LibXAIE_DIR}/lib
 )
-get_filename_component(XILINX_XAIE_LIBS ${XILINX_XAIE_LIBS} REALPATH)
 
+if(XILINX_XAIE_LIBS)
+  get_filename_component(XILINX_XAIE_LIBS ${XILINX_XAIE_LIBS} REALPATH)
+  get_filename_component(XILINX_XAIE_LIB_DIR ${XILINX_XAIE_LIBS} DIRECTORY)
+  get_filename_component(XILINX_XAIE_DIR ${XILINX_XAIE_LIB_DIR} DIRECTORY)
+
+  find_path(XILINX_XAIE_INCLUDE_DIR xaiengine.h
+    PATHS ${XILINX_XAIE_DIR}/include
+  )
+endif()
 
 include(FindPackageHandleStandardArgs)
 find_package_handle_standard_args(LibXAIE
