@@ -33,7 +33,7 @@
 #     Author: Kristof Denolf <kristof@xilinx.com>
 #     Date:   2017/12/05
 
-cmake_minimum_required(VERSION 2.8)
+cmake_minimum_required(VERSION 3.10)
 
 function(capFirstLetter smallName capName)
 	string(SUBSTRING ${smallName} 0 1 FIRST_LETTER)

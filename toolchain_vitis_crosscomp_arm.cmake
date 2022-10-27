@@ -32,37 +32,23 @@
 
 #     Authors: Kristof Denolf <kristof@xilinx.com> 
 #              Alireza Khodamoradi <alirezak@xilinx.com>
-#     Date:   2020/12/3
+#     Date:   2022/09/28
+#     NOTE: Currenlty only Vitis default sysroot tested and supported
 
-# cmake -DCMAKE_TOOLCHAIN_FILE=toolchain_crosscomp_arm.cmake ..
+# cmake -DCMAKE_TOOLCHAIN_FILE=toolchain_vitis_crosscomp_arm.cmake ..
 #  -DVitisArch="arm32 or arm64"
 #  -DVitisSysroot="absolute path to the sysroot folder"
 
+set(VitisArch "arm64" CACHE STRING "ARM arch: arm64 or arm32")
 
-#set(SDxPlatform "zcu102" CACHE STRING "SDx platform")
-
-#if (${SDxPlatform} STREQUAL "zcu102") 		#zcu102 clock ID def (MHz): 0=100, 1=200, 2=300, 3=400
-#  set(SDxClockID "3" CACHE STRING "SDx clock ID")
-#  message(STATUS "zcu102 clock def in MHz: 0=100, 1=200, 2=300, 3=400")
-#  set(SDxArch "arm64")
-#elseif (${SDxPlatform} STREQUAL "zc706") 	#zc706 clock ID def (MHz): 0=166, 1=143, 2=100, 3=200
-#  set(SDxClockID "3" CACHE STRING "SDx clock ID")
-#  message(STATUS "zc706 clock def in MHz: 0=100, 1=200, 2=300, 3=400")
-#  set(SDxArch "arm32")
-#elseif (${SDxPlatform} STREQUAL "zc702") 	#zc702 clock ID def (MHz): 0=166, 1=143, 2=100, 3=200
-#  set(SDxClockID "3" CACHE STRING "SDx clock ID")
-#  message(STATUS "zc702 clock def in MHz:  0=166, 1=143, 2=100, 3=200")
-#  set(SDxArch "arm32")
-#else (${SDxPlatform} STREQUAL "zcu102")
-#  message(STATUS "non default platform, please also set SDx clock ID (default clock ID is 0) and SDx arch (default is 64 bit)")
-#  set(SDxClockID "0" CACHE STRING "SDx clock ID")
-#  set(SDxArch "arm64" CACHE STRING "SDx aarch")
-#endif (${SDxPlatform} STREQUAL "zcu102")
+list(APPEND CMAKE_TRY_COMPILE_PLATFORM_VARIABLES VitisSysroot VitisArch)
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_LIST_DIR})
 set(CMAKE_TRY_COMPILE_TARGET_TYPE "STATIC_LIBRARY" CACHE STRING "" FORCE)
 
 #find Vitis 
+set(CMAKE_FIND_LIBRARY_PREFIXES "lib")
+set(CMAKE_FIND_LIBRARY_SUFFIXES ".a;.so")
 find_package(Vitis REQUIRED)
 set(VitisRoot ${VITIS_ROOT})
 
@@ -80,7 +66,7 @@ if (${VitisArch} STREQUAL "arm64") # 64 bit toolchain
   SET (gnuPrefix1 aarch64-linux)
   SET (gnuPrefix2 aarch64-linux-gnu)
   SET (gnuArch aarch64)
-
+  SET (sysrootPrefix aarch64-xilinx-linux)
   #extra compilation flags
   #NONE
 else (${VitisArch} STREQUAL "arm64") #32 bit toolchain
@@ -88,9 +74,10 @@ else (${VitisArch} STREQUAL "arm64") #32 bit toolchain
   SET (gnuPrefix1 gcc-arm-linux-gnueabi)
   SET (gnuPrefix2 arm-linux-gnueabihf)
   SET (gnuArch aarch32)
-  
+  SET (sysrootPrefix cortexa9t2hf-neon-xilinx-linux-gnueabi)
   #extra compilation flags
   SET (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -D__ARM_PCS_VFP")
+
 endif (${VitisArch} STREQUAL "arm64")
 
 
@@ -98,29 +85,27 @@ endif (${VitisArch} STREQUAL "arm64")
 set(CMAKE_C_COMPILER ${VitisRoot}/gnu/${gnuArch}/${VitisHostSystemName}/${gnuPrefix1}/bin/${gnuPrefix2}-gcc)
 set(CMAKE_CXX_COMPILER ${VitisRoot}/gnu/${gnuArch}/${VitisHostSystemName}/${gnuPrefix1}/bin/${gnuPrefix2}-g++)
 set(CMAKE_LINKER ${VitisRoot}/gnu/${gnuArch}/${VitisHostSystemName}/${gnuPrefix1}/bin/aarch64-linux-gnu-ld)
-set(CMAKE_AR  ${VitisRoot}/gnu/${gnuArch}/${VitisHostSystemName}/${gnuPrefix1}/bin/${gnuPrefix2}-ar CACHE FILEPATH "Archiver")
+set(CMAKE_AR ${VitisRoot}/gnu/${gnuArch}/${VitisHostSystemName}/${gnuPrefix1}/bin/${gnuPrefix2}-ar)
 
-
-
-
-#find sysroot first try the command line argument VitisSysroot, then try to find it as part of the platform or fall back to SDK for default Vitis platforms 
+#find sysroot first try the command line argument VitisSysroot, then try to find it as part Vitis
 find_path(VitisSysrootAsFound "usr/include/stdlib.h" PATHS ${VitisSysroot} PATH_SUFFIXES "" NO_DEFAULT_PATH)
-find_path(VitisSysrootAsFound "usr/include/stdlib.h" PATHS "${VitisPlatform}/sw/sysroot" PATH_SUFFIXES "" NO_DEFAULT_PATH)
+find_path(VitisSysrootAsFound "usr/include/stdlib.h" PATHS "${VitisRoot}/gnu/${gnuArch}/${VitisHostSystemName}/${gnuPrefix1}/${sysrootPrefix}/" PATH_SUFFIXES "" NO_DEFAULT_PATH)
 find_path(VitisSysrootAsFound "usr/include/stdlib.h" PATHS "${CMAKE_FIND_ROOT_PATH}/libc" PATH_SUFFIXES "" NO_DEFAULT_PATH)
 MESSAGE ("Vitis sysroot: " ${VitisSysrootAsFound})
 
 # set up cross compilation paths
 set(CMAKE_SYSROOT ${VitisSysrootAsFound})
-set(CMAKE_FIND_ROOT_PATH  ${VitisSysrootAsFound})
-#set(CMAKE_FIND_ROOT_PATH ${VitisRoot}/gnu/${gnuArch}/${VitisHostSystemName}/${gnuPrefix1}/${gnuPrefix2})
-SET (CMAKE_SKIP_BUILD_RPATH FALSE)
-SET (CMAKE_BUILD_WITH_INSTALL_RPATH TRUE)
-SET (CMAKE_INSTALL_RPATH ${VitisSysrootAsFound}/lib;${VitisSysrootAsFound}/usr/lib;${VitisSysrootAsFound}/lib/${gnuPrefix2};${VitisSysrootAsFound}/usr/lib/${gnuPrefix2})
-SET (CMAKE_LIBRARY_PATH ${VitisSysrootAsFound}/lib;${VitisSysrootAsFound}/usr/lib;${VitisSysrootAsFound}/lib/${gnuPrefix2};${VitisSysrootAsFound}/usr/lib/${gnuPrefix2})
-set (CMAKE_INCLUDE_PATH ${VitisSysrootAsFound}/usr/)
+set(CMAKE_FIND_ROOT_PATH ${VitisSysrootAsFound})
+set(CMAKE_SKIP_BUILD_RPATH FALSE)
+set(CMAKE_BUILD_WITH_INSTALL_RPATH TRUE)
+# Ensure that we build relocatable binaries
+set(CMAKE_INSTALL_RPATH $ORIGIN)
+set(CMAKE_LIBRARY_PATH ${VitisSysrootAsFound}/usr/lib)
+set(CMAKE_INCLUDE_PATH ${VitisSysrootAsFound}/usr/)
 # adjust the default behavior of the find commands:
 # search headers and libraries in the target environment
 set(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ONLY)
 set(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY)
+set(CMAKE_FIND_ROOT_PATH_MODE_PACKAGE ONLY)
 # search programs in the host environment
 set(CMAKE_FIND_ROOT_PATH_MODE_PROGRAM NEVER)

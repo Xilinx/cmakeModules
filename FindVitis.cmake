@@ -39,12 +39,18 @@
 ## 2: Variables
 # The following are set after configuration is done: 
 #  
-#  VITIS_VPP - The path to 'v++'
+#  VITIS_VPP - 'v++' with full path
 #  VITIS_ROOT - The path to the Vitis/$VERSION directory
-#  VITIS_XCHESS_MAKE - The path to 'xchessmk'
-#  VITIS_LIBME - The path to 'libme.a'
-#  VITIS_AIE_LIBC - The path to the AIEngine version of 'libc.a'
-#  VITIS_AIE_LIBM - The path to the AIEngine version of 'libm.a'
+#  VITIS_XCHESS_MAKE - 'xchessmk' with full path
+#  VITIS_LIBME - 'libme.a' with full path
+#  VITIS_AIE_LIBC - 'libc.a' with full path
+#  VITIS_AIE_LIBM - 'libm.a' with full path
+#
+## 3: Components
+# The following components are supported:
+#
+#  DSPLIB - the DSPLIB header library
+#     VITIS_DSPLIB_INCLUDE_DIR: the include directory for DSPLIB
 #----------------------------------------------------------
 
 include(FindPackageHandleStandardArgs)
@@ -56,29 +62,31 @@ find_program(VITIS_VPP v++)
 if(NOT VITIS_VPP)
 	message(STATUS "Unable to find v++")
 else(NOT VITIS_VPP)
-	message(STATUS "Found v++:${VITIS_VPP}")
+	message(STATUS "Found v++: ${VITIS_VPP}")
 	get_filename_component(VITIS_PARENT ${VITIS_VPP} PATH)
 	get_filename_component(VITIS_ROOT ${VITIS_PARENT} PATH)
 endif(NOT VITIS_VPP)
 
 # Find AIE tools
-find_program(VITIS_XCHESS_MAKE xchessmk)
+find_program(VITIS_XCHESS_MAKE xchessmk PATHS ${VITIS_ROOT}/cardano/bin ${VITIS_ROOT}/aietools/bin)
 if(NOT VITIS_XCHESS_MAKE)
 	message(STATUS "Unable to find xchessmk")
 else(NOT VITIS_XCHESS_MAKE)
-	message(STATUS "Found xchessmk:${VITIS_XCHESS_MAKE}")
+	message(STATUS "Found xchessmk: ${VITIS_XCHESS_MAKE}")
 	get_filename_component(_bindir ${VITIS_XCHESS_MAKE} DIRECTORY)
 	get_filename_component(VITIS_AIETOOLS_DIR ${_bindir} DIRECTORY)
 endif(NOT VITIS_XCHESS_MAKE)
 
+# Find libme.a
 find_library(VITIS_LIBME me NO_DEFAULT_PATH CMAKE_FIND_ROOT_PATH_BOTH PATHS
 			${VITIS_AIETOOLS_DIR}/data/cervino/lib/Release)
 if(NOT VITIS_LIBME)
 	message(STATUS "Unable to find libme.a")
 else(NOT VITIS_LIBME)
-	message(STATUS "Found libme.a:${VITIS_LIBME}")
+	message(STATUS "Found libme.a: ${VITIS_LIBME}")
 endif(NOT VITIS_LIBME)
 
+# Find AIE LIBC
 find_library(VITIS_AIE_LIBC c NO_DEFAULT_PATH CMAKE_FIND_ROOT_PATH_BOTH PATHS
 			${VITIS_AIETOOLS_DIR}/data/cervino/lib/runtime/lib/Release)
 if(NOT VITIS_AIE_LIBC)
@@ -87,6 +95,7 @@ else(NOT VITIS_AIE_LIBC)
 	message(STATUS "Found AIE libc.a:${VITIS_AIE_LIBC}")
 endif(NOT VITIS_AIE_LIBC)
 
+# Find AIE LIBM
 find_library(VITIS_AIE_LIBM m NO_DEFAULT_PATH CMAKE_FIND_ROOT_PATH_BOTH PATHS
 			${VITIS_AIETOOLS_DIR}/data/cervino/lib/runtime/lib/Release)
 if(NOT VITIS_AIE_LIBM)
@@ -95,20 +104,21 @@ else(NOT VITIS_AIE_LIBM)
 	message(STATUS "Found AIE libm.a:${VITIS_AIE_LIBM}")
 endif(NOT VITIS_AIE_LIBM)
 
-find_path(VITIS_INCLUDE_DIR "hls_stream.h" PATHS ${VITIS_ROOT}/include)
+# Find DSPLIB include
+find_path(VITIS_DSPLIB_INCLUDE_DIR "fir.h" PATHS ${VITIS_ROOT}/include/dsplib)
 
-if(NOT VITIS_INCLUDE_DIR)
-	message(STATUS "Unable to find Vitis include folder")
-else(NOT VITIS_INCLUDE_DIR)
-	message(STATUS "Found Vitis include folder: ${VITIS_INCLUDE_DIR}")
-endif(NOT VITIS_INCLUDE_DIR)
+if(NOT VITIS_DSPLIB_INCLUDE_DIR)
+	message(STATUS "Unable to find Vitis DSPLIB")
+else(NOT VITIS_DSPLIB_INCLUDE_DIR)
+	message(STATUS "Found Vitis DSPLIB include folder: ${VITIS_DSPLIB_INCLUDE_DIR}")
+	set(Vitis_DSPLIB_FOUND YES)
+endif(NOT VITIS_DSPLIB_INCLUDE_DIR)
 
-FIND_PACKAGE_HANDLE_STANDARD_ARGS(Vitis REQUIRED_VARS
+FIND_PACKAGE_HANDLE_STANDARD_ARGS(Vitis HANDLE_COMPONENTS REQUIRED_VARS
 		VITIS_ROOT
 		VITIS_VPP
 		VITIS_AIETOOLS_DIR
 		VITIS_XCHESS_MAKE
 		VITIS_LIBME
 		VITIS_AIE_LIBC
-		VITIS_AIE_LIBM
-		VITIS_INCLUDE_DIR)
+		VITIS_AIE_LIBM)

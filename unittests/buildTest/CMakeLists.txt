@@ -1,5 +1,5 @@
-  ###############################################################################
-#  Copyright (c) 2021, Xilinx, Inc.
+###############################################################################
+#  Copyright (c) 2018, Xilinx, Inc.
 #  All rights reserved.
 # 
 #  Redistribution and use in source and binary forms, with or without 
@@ -30,26 +30,15 @@
 #
 ###############################################################################
 
-#set(CMAKE_FIND_DEBUG_MODE 1)
+#     Author: Kristof Denolf <kristof@xilinx.com>
+#     Date:   2022/09/30
 
-find_path(XILINX_XAIE_INCLUDE_DIR xaiengine.h
-  PATHS /include /usr/include /opt/xaiengine/include ${LibXAIE_DIR}/include
-)
+# cmake needs this line
+cmake_minimum_required(VERSION 3.1)
 
-find_library(XILINX_XAIE_LIBS xaiengine
-  PATHS /lib /usr/lib /opt/xaiengine/lib ${LibXAIE_DIR}/lib
-)
-get_filename_component(XILINX_XAIE_LIBS ${XILINX_XAIE_LIBS} REALPATH)
+set(subDirLevels "../..")
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/${subDirLevels}) 
 
+project("simpleCompileTest")
 
-include(FindPackageHandleStandardArgs)
-find_package_handle_standard_args(LibXAIE
-  FOUND_VAR LibXAIE_FOUND
-  REQUIRED_VARS XILINX_XAIE_INCLUDE_DIR XILINX_XAIE_LIBS
-  )
-
-if(LibXAIE_FOUND)
-add_compile_definitions(AIE_LIBXAIE_ENABLE)
-include_directories(${XILINX_XAIE_INCLUDE_DIR})
-link_libraries(${XILINX_XAIE_LIBS})
-endif()
+add_executable(simpleCompileTest main.cpp)
