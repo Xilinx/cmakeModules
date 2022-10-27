@@ -44,17 +44,13 @@
 
 # NOTE: earlier version of Vitis sysroot refrence earlier gcc, e.g. 10.2.0 for 2021.2
 set(gccVer "11.2.0" CACHE STRING "gcc version used in sysroot") # 2022.1
+set(pythonVer "3.8" CACHE STRING "python version in sysroot")
 list(APPEND CMAKE_TRY_COMPILE_PLATFORM_VARIABLES gccVer)
 
 include(toolchain_clang_crosscomp_arm)
 
 # Vitis/PetaLinux sysroot specific 
-#set(CMAKE_C_FLAGS "-I${Sysroot}/usr/include/c++/${gccVer} -I${Sysroot}/usr/include/c++/${gccVer}/${sysrootPrefix} -B ${Sysroot}/usr/lib/${sysrootPrefix}/${gccVer} -Wl,-rpath-link=${Sysroot}/usr/lib/${sysrootPrefix}/${gccVer} -L${Sysroot}/usr/lib/${sysrootPrefix}/${gccVer}" CACHE STRING "" FORCE)
-#set(CMAKE_C_FLAGS "-Wl,-z,notext --sysroot=${Sysroot} --target=aarch64-linux-gnu -fuse-ld=lld -Wno-unused-command-line-argument" CACHE STRING "" FORCE)
-
-#set(CMAKE_C_FLAGS "-Wl,-z,notext -I${Sysroot}/usr/include/c++/${gccVer} -I${Sysroot}/usr/include/c++/${gccVer}/${sysrootPrefix} -B ${Sysroot}/usr/lib/${sysrootPrefix}/${gccVer} -Wl,-rpath-link=${Sysroot}/usr/lib/${sysrootPrefix}/${gccVer} -fuse-ld=lld -L${Sysroot}/usr/lib/${sysrootPrefix}/${gccVer}" CACHE STRING "" FORCE)
-
-set(CMAKE_C_FLAGS "-Wl,-z,notext -I${Sysroot}/usr/include/c++/${gccVer} -I${Sysroot}/usr/include/c++/${gccVer}/${sysrootPrefix} -B ${Sysroot}/usr/lib/${sysrootPrefix}/${gccVer} -Wl,-rpath-link=${Sysroot}/usr/lib/${sysrootPrefix}/${gccVer} --target=${gnuArch} -fuse-ld=lld -Wno-unused-command-line-argument -L${Sysroot}/usr/lib/${sysrootPrefix}/${gccVer}" CACHE STRING "" FORCE)
+set(CMAKE_C_FLAGS "-Wl,-z,notext -I${Sysroot}/usr/include/c++/${gccVer} -I${Sysroot}/usr/include/c++/${gccVer}/${sysrootPrefix} -B ${Sysroot}/usr/lib/${sysrootPrefix}/${gccVer} -Wl,-rpath-link=${Sysroot}/usr/lib/${sysrootPrefix}/${gccVer} --target=${gnuArch} -Wno-unused-command-line-argument -L${Sysroot}/usr/lib/${sysrootPrefix}/${gccVer}" CACHE STRING "" FORCE)
 
 # TODO: Does this need -L?
 set(CMAKE_SHARED_LINKER_FLAGS "-Wl,-z,notext -fuse-ld=lld -B ${Sysroot}/usr/lib/${sysrootPrefix}/${gccVer} -L${Sysroot}/usr/lib/${sysrootPrefix}/${gccVer}" CACHE STRING "" FORCE)
@@ -69,3 +65,11 @@ set(CMAKE_EXE_LINKER_FLAGS "-Wl,-z,notext -fuse-ld=lld -B ${Sysroot}/usr/lib/${s
 #set(CMAKE_CXX_FLAGS "${CMAKE_C_FLAGS}" CACHE STRING "" FORCE) 
 #set(CMAKE_ASM_FLAGS "${CMAKE_C_FLAGS}" CACHE STRING "" FORCE)
 
+# # Python
+# We have to explicitly set this extension.  Normally it would be determined by FindPython3, but
+# it's inference mechanism doesn't work when cross-compiling
+set(PYTHON_MODULE_EXTENSION ".cpython-38-aarch64-linux-gnu.so")
+set(Python3_ROOT_DIR ${Sysroot}/bin)
+
+set(Python_ROOT ${Sysroot}/usr/local/lib/python${pythonVer}/dist-packages)
+set(Python3_NumPy_INCLUDE_DIR ${Python_ROOT}/numpy/ CACHE STRING "" FORCE)
