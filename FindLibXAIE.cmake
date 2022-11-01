@@ -47,9 +47,3 @@ find_package_handle_standard_args(LibXAIE
   FOUND_VAR LibXAIE_FOUND
   REQUIRED_VARS XILINX_XAIE_INCLUDE_DIR XILINX_XAIE_LIBS
   )
-
-if(LibXAIE_FOUND)
-add_compile_definitions(AIE_LIBXAIE_ENABLE)
-include_directories(${XILINX_XAIE_INCLUDE_DIR})
-link_libraries(${XILINX_XAIE_LIBS})
-endif()
