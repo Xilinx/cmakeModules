@@ -41,6 +41,7 @@
 #  
 #  VITIS_VPP - 'v++' with full path
 #  VITIS_ROOT - The path to the Vitis/$VERSION directory
+#  VITIS_XCHESSCC - 'xchesscc' with full path
 #  VITIS_XCHESS_MAKE - 'xchessmk' with full path
 #  VITIS_LIBME - 'libme.a' with full path
 #  VITIS_AIE_LIBC - 'libc.a' with full path
@@ -68,6 +69,15 @@ else(NOT VITIS_VPP)
 endif(NOT VITIS_VPP)
 
 # Find AIE tools
+find_program(VITIS_XCHESSCC xchesscc PATHS ${VITIS_ROOT}/cardano/bin ${VITIS_ROOT}/aietools/bin)
+if(NOT VITIS_XCHESSCC)
+	message(STATUS "Unable to find xchesscc")
+else(NOT VITIS_XCHESSCC)
+	message(STATUS "Found xchesscc: ${VITIS_XCHESSCC}")
+	get_filename_component(_bindir ${VITIS_XCHESSCC} DIRECTORY)
+	get_filename_component(VITIS_AIETOOLS_DIR ${_bindir} DIRECTORY)
+endif(NOT VITIS_XCHESSCC)
+
 find_program(VITIS_XCHESS_MAKE xchessmk PATHS ${VITIS_ROOT}/cardano/bin ${VITIS_ROOT}/aietools/bin)
 if(NOT VITIS_XCHESS_MAKE)
 	message(STATUS "Unable to find xchessmk")
@@ -118,6 +128,7 @@ FIND_PACKAGE_HANDLE_STANDARD_ARGS(Vitis HANDLE_COMPONENTS REQUIRED_VARS
 		VITIS_ROOT
 		VITIS_VPP
 		VITIS_AIETOOLS_DIR
+		VITIS_XCHESSCC
 		VITIS_XCHESS_MAKE
 		VITIS_LIBME
 		VITIS_AIE_LIBC
