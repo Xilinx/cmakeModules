@@ -38,11 +38,10 @@
 #  -DArch="arm32 or arm64"
 #  -DSysroot="absolute path to the sysroot folder"
 
+
 set(Arch "arm64" CACHE STRING "ARM arch: arm64 or arm32")
-
-#message("toolchain_clang_crosscomp_arm.cmake")
-
-list(APPEND CMAKE_TRY_COMPILE_PLATFORM_VARIABLES Sysroot Arch)
+set(pythonVer "3.8" CACHE STRING "python version in sysroot")
+list(APPEND CMAKE_TRY_COMPILE_PLATFORM_VARIABLES Sysroot Arch pythonVer)
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_LIST_DIR})
 
@@ -82,7 +81,7 @@ set(CMAKE_ASM_COMPILER clang)
 set(CMAKE_STRIP llvm-strip)
 set(CLANG_LLD lld)
 
-#set(CMAKE_C_FLAGS "-fuse-ld=lld -Wl,-z,notext -Wno-unused-command-line-argument" CACHE STRING "" FORCE)
+#set compile flags
 set(CMAKE_CXX_FLAGS "${CMAKE_C_FLAGS}" CACHE STRING "" FORCE)
 set(CMAKE_ASM_FLAGS "${CMAKE_C_FLAGS}" CACHE STRING "" FORCE)
 
@@ -104,10 +103,16 @@ set(CMAKE_FIND_ROOT_PATH_MODE_PACKAGE ONLY)
 set(CMAKE_FIND_ROOT_PATH_MODE_PROGRAM NEVER)
 
 # needed so clang references the right libstdc++
-#set(GCC_INSTALL_PREFIX /tools/batonroot/rodin/devkits/lnx64/gcc-8.3.0/ CACHE STRING "" FORCE)
 find_path(gcc_path "gcc")
 set(GCC_INSTALL_PREFIX ${gcc_path}/.. CACHE STRING "" FORCE)
+set(CMAKE_EXE_LINKER_FLAGS "-Wl,-z,notext -fuse-ld=lld" CACHE STRING "" FORCE)
+set(CMAKE_SHARED_LINKER_FLAGS "-Wl,-z,notext -fuse-ld=lld" CACHE STRING "" FORCE)
 
-# Vitis/PetaLinux sysroot specific 
-#set(CMAKE_EXE_LINKER_FLAGS "-Wl,-z,notext -fuse-ld=lld -B ${Sysroot}/usr/lib/${sysrootPrefix}/11.2.0 -L ${Sysroot}/usr/lib/${sysrootPrefix}/11.2.0" CACHE STRING "" FORCE)
-#link_directories(${Sysroot}/usr/lib/${sysrootPrefix}/11.2.0)
+# # Python
+# We have to explicitly set this extension.  Normally it would be determined by FindPython3, but
+# it's inference mechanism doesn't work when cross-compiling
+set(PYTHON_MODULE_EXTENSION ".cpython-38-aarch64-linux-gnu.so")
+set(Python3_ROOT_DIR ${Sysroot}/bin)
+
+set(Python_ROOT ${Sysroot}/usr/local/lib/python${pythonVer}/dist-packages)
+set(Python3_NumPy_INCLUDE_DIR ${Python_ROOT}/numpy/ CACHE STRING "" FORCE)
