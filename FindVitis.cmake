@@ -97,10 +97,10 @@ else(NOT VITIS_DSPLIB_INCLUDE_DIR)
 	set(Vitis_DSPLIB_FOUND YES)
 endif(NOT VITIS_DSPLIB_INCLUDE_DIR)
 
-macro(find_aie_arch arch dir)
+macro(find_aie_arch arch libdir)
 	# Find libme.a
 	find_library(VITIS_${arch}_LIBME me NO_DEFAULT_PATH CMAKE_FIND_ROOT_PATH_BOTH PATHS
-				${dir}/lib/Release)
+				${libdir}/Release)
 	if(NOT VITIS_${arch}_LIBME)
 		message(STATUS "Unable to find ${arch} libme.a")
 	else(NOT VITIS_${arch}_LIBME)
@@ -109,7 +109,7 @@ macro(find_aie_arch arch dir)
 
 	# Find LIBC
 	find_library(VITIS_${arch}_LIBC c NO_DEFAULT_PATH CMAKE_FIND_ROOT_PATH_BOTH PATHS
-				${dir}/lib/runtime/lib/Release)
+				${libdir}/runtime/lib/Release)
 	if(NOT VITIS_${arch}_LIBC)
 		message(STATUS "Unable to find ${arch} libc.a")
 	else(NOT VITIS_${arch}_LIBC)
@@ -118,7 +118,7 @@ macro(find_aie_arch arch dir)
 
 	# Find LIBM
 	find_library(VITIS_${arch}_LIBM m NO_DEFAULT_PATH CMAKE_FIND_ROOT_PATH_BOTH PATHS
-				${dir}/lib/runtime/lib/Release)
+				${libdir}/runtime/lib/Release)
 	if(NOT VITIS_${arch}_LIBM)
 		message(STATUS "Unable to find ${arch} libm.a")
 	else(NOT VITIS_${arch}_LIBM)
@@ -127,20 +127,22 @@ macro(find_aie_arch arch dir)
 
 	# Find LIBSOFTFLOAT
 	find_library(VITIS_${arch}_LIBSOFTFLOAT softfloat NO_DEFAULT_PATH CMAKE_FIND_ROOT_PATH_BOTH PATHS
-				${dir}/lib/softfloat/lib/Release)
+				${libdir}/softfloat/lib/Release)
 	if(NOT VITIS_${arch}_LIBSOFTFLOAT)
 		message(STATUS "Unable to find ${arch} libsoftfloat.a")
 	else(NOT VITIS_${arch}_LIBSOFTFLOAT)
 		message(STATUS "Found ${arch} libsoftfloat.a:${VITIS_${arch}_LIBSOFTFLOAT}")
 	endif(NOT VITIS_${arch}_LIBSOFTFLOAT)
+
+	set(VITIS_${arch}_LIBDIR ${libdir})
 endmacro()
 
-if(EXISTS "${VITIS_AIETOOLS_DIR}/data/cervino")
-  find_aie_arch(AIE ${VITIS_AIETOOLS_DIR}/data/cervino)
+if(EXISTS "${VITIS_AIETOOLS_DIR}/data/cervino/lib")
+  find_aie_arch(AIE ${VITIS_AIETOOLS_DIR}/data/cervino/lib)
 else()
-  find_aie_arch(AIE ${VITIS_AIETOOLS_DIR}/data/versal_prod)
+  find_aie_arch(AIE ${VITIS_AIETOOLS_DIR}/data/versal_prod/lib)
 endif()
-find_aie_arch(AIE2 ${VITIS_AIETOOLS_DIR}/data/aie_ml)
+find_aie_arch(AIE2 ${VITIS_AIETOOLS_DIR}/data/aie_ml/lib)
 
 # For backward compatibility
 set(VITIS_LIBME ${VITIS_AIE_LIBME})
@@ -152,10 +154,12 @@ FIND_PACKAGE_HANDLE_STANDARD_ARGS(Vitis HANDLE_COMPONENTS REQUIRED_VARS
 		VITIS_XCHESSCC
 		VITIS_XCHESS_MAKE
 		VITIS_LIBME
+		VITIS_AIE_LIBDIR
 		VITIS_AIE_LIBME
 		VITIS_AIE_LIBC
 		VITIS_AIE_LIBM
 		VITIS_AIE_LIBSOFTFLOAT
+		VITIS_AIE2_LIBDIR
 		VITIS_AIE2_LIBME
 		VITIS_AIE2_LIBC
 		VITIS_AIE2_LIBM
