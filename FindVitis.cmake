@@ -87,42 +87,6 @@ else(NOT VITIS_XCHESS_MAKE)
 	get_filename_component(VITIS_AIETOOLS_DIR ${_bindir} DIRECTORY)
 endif(NOT VITIS_XCHESS_MAKE)
 
-# Find libme.a
-find_library(VITIS_LIBME me NO_DEFAULT_PATH CMAKE_FIND_ROOT_PATH_BOTH PATHS
-			${VITIS_AIETOOLS_DIR}/data/cervino/lib/Release)
-if(NOT VITIS_LIBME)
-	message(STATUS "Unable to find libme.a")
-else(NOT VITIS_LIBME)
-	message(STATUS "Found libme.a: ${VITIS_LIBME}")
-endif(NOT VITIS_LIBME)
-
-# Find AIE LIBC
-find_library(VITIS_AIE_LIBC c NO_DEFAULT_PATH CMAKE_FIND_ROOT_PATH_BOTH PATHS
-			${VITIS_AIETOOLS_DIR}/data/cervino/lib/runtime/lib/Release)
-if(NOT VITIS_AIE_LIBC)
-	message(STATUS "Unable to find AIE libc.a")
-else(NOT VITIS_AIE_LIBC)
-	message(STATUS "Found AIE libc.a:${VITIS_AIE_LIBC}")
-endif(NOT VITIS_AIE_LIBC)
-
-# Find AIE LIBM
-find_library(VITIS_AIE_LIBM m NO_DEFAULT_PATH CMAKE_FIND_ROOT_PATH_BOTH PATHS
-			${VITIS_AIETOOLS_DIR}/data/cervino/lib/runtime/lib/Release)
-if(NOT VITIS_AIE_LIBM)
-	message(STATUS "Unable to find AIE libm.a")
-else(NOT VITIS_AIE_LIBM)
-	message(STATUS "Found AIE libm.a:${VITIS_AIE_LIBM}")
-endif(NOT VITIS_AIE_LIBM)
-
-# Find AIE LIBSOFTFLOAT
-find_library(VITIS_AIE_LIBSOFTFLOAT softfloat NO_DEFAULT_PATH CMAKE_FIND_ROOT_PATH_BOTH PATHS
-			${VITIS_AIETOOLS_DIR}/data/cervino/lib/softfloat/lib/Release)
-if(NOT VITIS_AIE_LIBSOFTFLOAT)
-	message(STATUS "Unable to find AIE libsoftfloat.a")
-else(NOT VITIS_AIE_LIBSOFTFLOAT)
-	message(STATUS "Found AIE libsoftfloat.a:${VITIS_AIE_LIBSOFTFLOAT}")
-endif(NOT VITIS_AIE_LIBSOFTFLOAT)
-
 # Find DSPLIB include
 find_path(VITIS_DSPLIB_INCLUDE_DIR "fir.h" PATHS ${VITIS_ROOT}/include/dsplib)
 
@@ -133,6 +97,54 @@ else(NOT VITIS_DSPLIB_INCLUDE_DIR)
 	set(Vitis_DSPLIB_FOUND YES)
 endif(NOT VITIS_DSPLIB_INCLUDE_DIR)
 
+macro(find_aie_arch arch dir)
+	# Find libme.a
+	find_library(VITIS_${arch}_LIBME me NO_DEFAULT_PATH CMAKE_FIND_ROOT_PATH_BOTH PATHS
+				${dir}/lib/Release)
+	if(NOT VITIS_${arch}_LIBME)
+		message(STATUS "Unable to find ${arch} libme.a")
+	else(NOT VITIS_${arch}_LIBME)
+		message(STATUS "Found ${arch} libme.a: ${VITIS_LIBME}")
+	endif(NOT VITIS_${arch}_LIBME)
+
+	# Find LIBC
+	find_library(VITIS_${arch}_LIBC c NO_DEFAULT_PATH CMAKE_FIND_ROOT_PATH_BOTH PATHS
+				${dir}/lib/runtime/lib/Release)
+	if(NOT VITIS_${arch}_LIBC)
+		message(STATUS "Unable to find ${arch} libc.a")
+	else(NOT VITIS_${arch}_LIBC)
+		message(STATUS "Found ${arch} libc.a:${VITIS_${arch}_LIBC}")
+	endif(NOT VITIS_${arch}_LIBC)
+
+	# Find LIBM
+	find_library(VITIS_${arch}_LIBM m NO_DEFAULT_PATH CMAKE_FIND_ROOT_PATH_BOTH PATHS
+				${dir}/lib/runtime/lib/Release)
+	if(NOT VITIS_${arch}_LIBM)
+		message(STATUS "Unable to find ${arch} libm.a")
+	else(NOT VITIS_${arch}_LIBM)
+		message(STATUS "Found ${arch} libm.a:${VITIS_${arch}_LIBM}")
+	endif(NOT VITIS_${arch}_LIBM)
+
+	# Find LIBSOFTFLOAT
+	find_library(VITIS_${arch}_LIBSOFTFLOAT softfloat NO_DEFAULT_PATH CMAKE_FIND_ROOT_PATH_BOTH PATHS
+				${dir}/lib/softfloat/lib/Release)
+	if(NOT VITIS_${arch}_LIBSOFTFLOAT)
+		message(STATUS "Unable to find ${arch} libsoftfloat.a")
+	else(NOT VITIS_${arch}_LIBSOFTFLOAT)
+		message(STATUS "Found ${arch} libsoftfloat.a:${VITIS_${arch}_LIBSOFTFLOAT}")
+	endif(NOT VITIS_${arch}_LIBSOFTFLOAT)
+endmacro()
+
+if(EXISTS "${VITIS_AIETOOLS_DIR}/data/cervino")
+  find_aie_arch(AIE ${VITIS_AIETOOLS_DIR}/data/cervino)
+else()
+  find_aie_arch(AIE ${VITIS_AIETOOLS_DIR}/data/versal_prod)
+endif()
+find_aie_arch(AIE2 ${VITIS_AIETOOLS_DIR}/data/aie_ml)
+
+# For backward compatibility
+set(VITIS_LIBME ${VITIS_AIE_LIBME})
+
 FIND_PACKAGE_HANDLE_STANDARD_ARGS(Vitis HANDLE_COMPONENTS REQUIRED_VARS
 		VITIS_ROOT
 		VITIS_VPP
@@ -140,7 +152,12 @@ FIND_PACKAGE_HANDLE_STANDARD_ARGS(Vitis HANDLE_COMPONENTS REQUIRED_VARS
 		VITIS_XCHESSCC
 		VITIS_XCHESS_MAKE
 		VITIS_LIBME
+		VITIS_AIE_LIBME
 		VITIS_AIE_LIBC
 		VITIS_AIE_LIBM
-		VITIS_AIE_LIBSOFTFLOAT)
+		VITIS_AIE_LIBSOFTFLOAT
+		VITIS_AIE2_LIBME
+		VITIS_AIE2_LIBC
+		VITIS_AIE2_LIBM
+		VITIS_AIE2_LIBSOFTFLOAT)
 
