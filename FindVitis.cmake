@@ -90,7 +90,7 @@ else(NOT VITIS_XCHESSCC)
 	get_filename_component(VITIS_AIETOOLS_DIR ${_bindir} DIRECTORY)
 endif(NOT VITIS_XCHESSCC)
 
-find_program(VITIS_XCHESS_MAKE xchessmk ${VITIS_ROOT}/aietools/bin)
+find_program(VITIS_XCHESS_MAKE xchessmk PATHS ${VITIS_ROOT}/aietools/bin)
 if(NOT VITIS_XCHESS_MAKE)
 	message(STATUS "Unable to find xchessmk")
 else(NOT VITIS_XCHESS_MAKE)
