@@ -1,5 +1,5 @@
 ###############################################################################
-#  Copyright (c) 2020-2021, Xilinx, Inc.
+#  Copyright (c) 2020-2023, Xilinx, Inc.
 #  All rights reserved.
 # 
 #  Redistribution and use in source and binary forms, with or without 
@@ -39,84 +39,70 @@
 ## 2: Variables
 # The following are set after configuration is done: 
 #  
-#  VITIS_VPP - 'v++' with full path
-#  VITIS_ROOT - The path to the Vitis/$VERSION directory
-#  VITIS_XCHESSCC - 'xchesscc' with full path
-#  VITIS_XCHESS_MAKE - 'xchessmk' with full path
-#  VITIS_LIBME - 'libme.a' with full path
-#  VITIS_AIE_LIBC - 'libc.a' with full path
-#  VITIS_AIE_LIBM - 'libm.a' with full path
+#  VITIS_AIE2_LIBME - 'libme.a' with full path
+#  VITIS_AIE2_LIBC - 'libc.a' with full path
+#  VITIS_AIE2_LIBM - 'libm.a' with full path
+#  VITIS_AIE2_LIBSOFTFLOAT - 'softfloat.a' with full path
 #
 ## 3: Components
 # The following components are supported:
 #
-#  AIE
-#  AIE2
 #----------------------------------------------------------
 
 include(FindPackageHandleStandardArgs)
 
-list(LENGTH Vitis_FIND_COMPONENTS componentsSize)
-if(componentsSize EQUAL 0)
- 	message(STATUS "Error: AIE version needed as COMPONENT, setting AIE as default")
-	list(APPEND Vitis_FIND_COMPONENTS "AIE")
-endif()
+set(aieVersionSpecficPath "aie_ml")
 
 #if Xilinx tools correctly installed they are added to $ENV{PATH} one of CMake's default search paths
-
-# Find v++
-find_program(VITIS_VPP v++)
-if(NOT VITIS_VPP)
-	message(STATUS "Unable to find v++")
-else(NOT VITIS_VPP)
-	message(STATUS "Found v++: ${VITIS_VPP}")
-	get_filename_component(VITIS_PARENT ${VITIS_VPP} PATH)
-	get_filename_component(VITIS_ROOT ${VITIS_PARENT} PATH)
-endif(NOT VITIS_VPP)
-
 # Find AIE tools
 find_program(VITIS_XCHESSCC xchesscc PATHS ${VITIS_ROOT}/aietools/bin)
 if(NOT VITIS_XCHESSCC)
-	message(STATUS "Unable to find xchesscc")
+	message(STATUS "Unable to find xchesscc, needed to find AIE libs")
 else(NOT VITIS_XCHESSCC)
-	message(STATUS "Found xchesscc: ${VITIS_XCHESSCC}")
 	get_filename_component(_bindir ${VITIS_XCHESSCC} DIRECTORY)
 	get_filename_component(VITIS_AIETOOLS_DIR ${_bindir} DIRECTORY)
 endif(NOT VITIS_XCHESSCC)
 
-find_program(VITIS_XCHESS_MAKE xchessmk ${VITIS_ROOT}/aietools/bin)
-if(NOT VITIS_XCHESS_MAKE)
-	message(STATUS "Unable to find xchessmk")
-else(NOT VITIS_XCHESS_MAKE)
-	message(STATUS "Found xchessmk: ${VITIS_XCHESS_MAKE}")
-	get_filename_component(_bindir ${VITIS_XCHESS_MAKE} DIRECTORY)
-	get_filename_component(VITIS_AIETOOLS_DIR ${_bindir} DIRECTORY)
-endif(NOT VITIS_XCHESS_MAKE)
+# Find libme.a
+find_library(VITIS_AIE2_LIBME me NO_DEFAULT_PATH CMAKE_FIND_ROOT_PATH_BOTH PATHS
+		${VITIS_AIETOOLS_DIR}/data/${aieVersionSpecficPath}/lib/Release)
+if(NOT VITIS_AIE2_LIBME)
+	message(STATUS "Unable to find AIE2 libme.a")
+else(NOT VITIS_AIE2_LIBME)
+	message(STATUS "Found AIE2 libme.a: ${VITIS_AIE2_LIBME}")
+endif(NOT VITIS_AIE2_LIBME)
 
-# Find DSPLIB include
-find_path(VITIS_DSPLIB_INCLUDE_DIR "fir.h" PATHS ${VITIS_ROOT}/include/dsplib)
+# Find AIE LIBC
+find_library(VITIS_AIE2_LIBC c NO_DEFAULT_PATH CMAKE_FIND_ROOT_PATH_BOTH PATHS
+			${VITIS_AIETOOLS_DIR}/data/${aieVersionSpecficPath}/lib/runtime/lib/Release)
+if(NOT VITIS_AIE2_LIBC)
+	message(STATUS "Unable to find AIE2 libc.a")
+else(NOT VITIS_AIE2_LIBC)
+	message(STATUS "Found AIE2 libc.a:${VITIS_AIE2_LIBC}")
+endif(NOT VITIS_AIE2_LIBC)
 
-if(NOT VITIS_DSPLIB_INCLUDE_DIR)
-	message(STATUS "Unable to find Vitis DSPLIB")
-else(NOT VITIS_DSPLIB_INCLUDE_DIR)
-	message(STATUS "Found Vitis DSPLIB include folder: ${VITIS_DSPLIB_INCLUDE_DIR}")
-	set(Vitis_DSPLIB_FOUND YES)
-endif(NOT VITIS_DSPLIB_INCLUDE_DIR)
+# Find AIE LIBM
+find_library(VITIS_AIE2_LIBM m NO_DEFAULT_PATH CMAKE_FIND_ROOT_PATH_BOTH PATHS
+			${VITIS_AIETOOLS_DIR}/data/${aieVersionSpecficPath}/lib/runtime/lib/Release)
+if(NOT VITIS_AIE2_LIBM)
+	message(STATUS "Unable to find AIE2 libm.a")
+else(NOT VITIS_AIE2_LIBM)
+	message(STATUS "Found AIE2 libm.a:${VITIS_AIE2_LIBM}")
+endif(NOT VITIS_AIE2_LIBM)
 
-# Find Components
-foreach(comp ${Vitis_FIND_COMPONENTS})
-	message(STATUS "looking for component: ${comp}")
-	find_package(Vitis${comp})
-	if (Vitis${comp}_FOUND)
-		set(Vitis_${comp}_FOUND TRUE)
-	endif()
+# Find AIE LIBSOFTFLOAT
+find_library(VITIS_AIE2_LIBSOFTFLOAT softfloat NO_DEFAULT_PATH CMAKE_FIND_ROOT_PATH_BOTH PATHS
+			${VITIS_AIETOOLS_DIR}/data/${aieVersionSpecficPath}/lib/softfloat/lib/Release)
+if(NOT VITIS_AIE2_LIBSOFTFLOAT)
+	message(STATUS "Unable to find AIE2 libsoftfloat.a")
+else(NOT VITIS_AIE2_LIBSOFTFLOAT)
+	message(STATUS "Found AIE2 libsoftfloat.a:${VITIS_AIE2_LIBSOFTFLOAT}")
+endif(NOT VITIS_AIE2_LIBSOFTFLOAT)
 
-endforeach()
-
-FIND_PACKAGE_HANDLE_STANDARD_ARGS(Vitis HANDLE_COMPONENTS REQUIRED_VARS
-		VITIS_ROOT
-		VITIS_VPP
+FIND_PACKAGE_HANDLE_STANDARD_ARGS(VitisAIE2 REQUIRED_VARS
 		VITIS_AIETOOLS_DIR
-		VITIS_XCHESSCC
-		VITIS_XCHESS_MAKE
-		VITIS_DSPLIB_INCLUDE_DIR)
+		VITIS_AIE2_LIBME
+		VITIS_AIE2_LIBC
+		VITIS_AIE2_LIBM
+		VITIS_AIE2_LIBSOFTFLOAT
+	)
