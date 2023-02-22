@@ -11,4 +11,5 @@ project(test_Find_Vitis)
 
 #find_package(Vitis COMPONENTS AIE)
 #find_package(Vitis COMPONENTS AIE2)
+#find_package(Vitis)
 find_package(Vitis COMPONENTS AIE AIE2)
