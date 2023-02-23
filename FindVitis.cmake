@@ -106,7 +106,7 @@ if(NOT VITIS_DSPLIB_INCLUDE_DIR)
 	message(STATUS "Unable to find Vitis DSPLIB")
 else(NOT VITIS_DSPLIB_INCLUDE_DIR)
 	message(STATUS "Found Vitis DSPLIB include folder: ${VITIS_DSPLIB_INCLUDE_DIR}")
-	set(Vitis_DSPLIB_FOUND YES)
+	set(Vitis_DSPLIB_FOUND TRUE)
 endif(NOT VITIS_DSPLIB_INCLUDE_DIR)
 
 # Find Components
@@ -118,6 +118,16 @@ foreach(comp ${Vitis_FIND_COMPONENTS})
 	elseif(${comp} STREQUAL "AIE2")
 		set(aieVersionSpecificPath "aie_ml")
 	endif()
+
+	# Find aie_core.h
+	find_path(VITIS_${comp}_INCLUDE_DIR "aie_core.h" PATHS ${VITIS_AIETOOLS_DIR}/data/${aieVersionSpecificPath}/lib
+			NO_DEFAULT_PATH)
+		
+	if(NOT VITIS_${comp}_INCLUDE_DIR)
+		message(STATUS "Unable to find ${comp} include dir")
+	else(NOT VITIS_${comp}_INCLUDE_DIR)
+		message(STATUS "Found ${comp} include folder: ${VITIS_${comp}_INCLUDE_DIR}")
+	endif(NOT VITIS_${comp}_INCLUDE_DIR)
 
 	# Find libme.a
 	find_library(VITIS_${comp}_LIBME me NO_DEFAULT_PATH CMAKE_FIND_ROOT_PATH_BOTH PATHS
@@ -146,6 +156,16 @@ foreach(comp ${Vitis_FIND_COMPONENTS})
 		message(STATUS "Found ${comp} libm.a:${VITIS_${comp}_LIBM}")
 	endif(NOT VITIS_${comp}_LIBM)
 
+	# Find assert.h in AIE runtime include dir
+	find_path(VITIS_${comp}_RUNTIME_INCLUDE_DIR "assert.h" PATHS ${VITIS_AIETOOLS_DIR}/data/${aieVersionSpecificPath}/lib/runtime/include
+		NO_DEFAULT_PATH)
+	
+	if(NOT VITIS_${comp}_RUNTIME_INCLUDE_DIR)
+		message(STATUS "Unable to find ${comp} runtime include dir")
+	else(NOT VITIS_${comp}_RUNTIME_INCLUDE_DIR)
+		message(STATUS "Found ${comp} runtime include folder: ${VITIS_${comp}_RUNTIME_INCLUDE_DIR}")
+	endif(NOT VITIS_${comp}_RUNTIME_INCLUDE_DIR)
+
 	# Find AIE LIBSOFTFLOAT
 	find_library(VITIS_${comp}_LIBSOFTFLOAT softfloat NO_DEFAULT_PATH CMAKE_FIND_ROOT_PATH_BOTH PATHS
 				${VITIS_AIETOOLS_DIR}/data/${aieVersionSpecificPath}/lib/softfloat/lib/Release)
@@ -156,7 +176,7 @@ foreach(comp ${Vitis_FIND_COMPONENTS})
 	endif(NOT VITIS_${comp}_LIBSOFTFLOAT)
 
 	#find_package(Vitis${comp})
-	if (VITIS_${comp}_LIBME AND VITIS_${comp}_LIBC AND VITIS_${comp}_LIBM AND VITIS_${comp}_LIBSOFTFLOAT)
+	if (VITIS_${comp}_INCLUDE_DIR AND VITIS_${comp}_LIBME AND VITIS_${comp}_LIBC AND VITIS_${comp}_LIBM AND VITIS_${comp}_RUNTIME_INCLUDE_DIR AND VITIS_${comp}_LIBSOFTFLOAT)
 		set(Vitis_${comp}_FOUND TRUE)
 	endif()
 
