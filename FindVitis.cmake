@@ -100,7 +100,8 @@ else(NOT VITIS_XCHESS_MAKE)
 endif(NOT VITIS_XCHESS_MAKE)
 
 # Find DSPLIB include
-find_path(VITIS_DSPLIB_INCLUDE_DIR "fir.h" PATHS ${VITIS_ROOT}/include/dsplib)
+find_path(VITIS_DSPLIB_INCLUDE_DIR "fir.h" PATHS ${VITIS_ROOT}/include/dsplib
+		CMAKE_FIND_ROOT_PATH_BOTH)
 
 if(NOT VITIS_DSPLIB_INCLUDE_DIR)
 	message(STATUS "Unable to find Vitis DSPLIB")
@@ -121,8 +122,7 @@ foreach(comp ${Vitis_FIND_COMPONENTS})
 
 	# Find aie_core.h
 	find_path(VITIS_${comp}_INCLUDE_DIR "aie_core.h" PATHS ${VITIS_AIETOOLS_DIR}/data/${aieVersionSpecificPath}/lib
-			NO_DEFAULT_PATH)
-		
+			NO_DEFAULT_PATH CMAKE_FIND_ROOT_PATH_BOTH)
 	if(NOT VITIS_${comp}_INCLUDE_DIR)
 		message(STATUS "Unable to find ${comp} include dir")
 	else(NOT VITIS_${comp}_INCLUDE_DIR)
@@ -158,7 +158,7 @@ foreach(comp ${Vitis_FIND_COMPONENTS})
 
 	# Find assert.h in AIE runtime include dir
 	find_path(VITIS_${comp}_RUNTIME_INCLUDE_DIR "assert.h" PATHS ${VITIS_AIETOOLS_DIR}/data/${aieVersionSpecificPath}/lib/runtime/include
-		NO_DEFAULT_PATH)
+		NO_DEFAULT_PATH CMAKE_FIND_ROOT_PATH_BOTH)
 	
 	if(NOT VITIS_${comp}_RUNTIME_INCLUDE_DIR)
 		message(STATUS "Unable to find ${comp} runtime include dir")
