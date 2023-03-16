@@ -48,15 +48,19 @@
 ## 3: Components
 # The following components are supported:
 ###  3.1. AIE
+#  VITIS_AIE_INCLUDE_DIR - AIE full include path
 #  VITIS_AIE_LIBME - 'libme.a' with full path
 #  VITIS_AIE_LIBC - 'libc.a' with full path
 #  VITIS_AIE_LIBM - 'libm.a' with full path
+#  VITIS_AIE_RUNTIME_INCLUDE_DIR - AIE runtime full include path
 #  VITIS_AIE_LIBSOFTFLOAT - 'softfloat.a' with full path
 #
 ### 3.2. AIE2
+#  VITIS_AIE2_INCLUDE_DIR - AIE2 full include path
 #  VITIS_AIE2_LIBME - 'libme.a' with full path
 #  VITIS_AIE2_LIBC - 'libc.a' with full path
 #  VITIS_AIE2_LIBM - 'libm.a' with full path
+#  VITIS_AIE2_RUNTIME_INCLUDE_DIR - AIE2 runtime full include path
 #  VITIS_AIE2_LIBSOFTFLOAT - 'softfloat.a' with full path
 #----------------------------------------------------------
 
