@@ -48,15 +48,19 @@
 ## 3: Components
 # The following components are supported:
 ###  3.1. AIE
+#  VITIS_AIE_INCLUDE_DIR - AIE full include path
 #  VITIS_AIE_LIBME - 'libme.a' with full path
 #  VITIS_AIE_LIBC - 'libc.a' with full path
 #  VITIS_AIE_LIBM - 'libm.a' with full path
+#  VITIS_AIE_RUNTIME_INCLUDE_DIR - AIE runtime full include path
 #  VITIS_AIE_LIBSOFTFLOAT - 'softfloat.a' with full path
 #
 ### 3.2. AIE2
+#  VITIS_AIE2_INCLUDE_DIR - AIE2 full include path
 #  VITIS_AIE2_LIBME - 'libme.a' with full path
 #  VITIS_AIE2_LIBC - 'libc.a' with full path
 #  VITIS_AIE2_LIBM - 'libm.a' with full path
+#  VITIS_AIE2_RUNTIME_INCLUDE_DIR - AIE2 runtime full include path
 #  VITIS_AIE2_LIBSOFTFLOAT - 'softfloat.a' with full path
 #----------------------------------------------------------
 
@@ -78,6 +82,27 @@ else(NOT VITIS_VPP)
 	message(STATUS "Found v++: ${VITIS_VPP}")
 	get_filename_component(VITIS_PARENT ${VITIS_VPP} PATH)
 	get_filename_component(VITIS_ROOT ${VITIS_PARENT} PATH)
+	execute_process(COMMAND v++ -v
+		OUTPUT_VARIABLE vppVersionOutput	
+	)
+	string(REGEX MATCH "v[0-9]+\.[0-9]" vppVersionNumber ${vppVersionOutput})
+	string(REGEX MATCH "[0-9]+" vppVersionMajor ${vppVersionNumber})
+	string(REGEX MATCH "[0-9]$" vppVersionMinor ${vppVersionNumber})
+	message(STATUS "vpp version number: ${vppVersionNumber}")
+
+	if(NOT DEFINED Vitis_FIND_VERSION)
+		set(Vitis_VERSION_MAJOR ${vppVersionMajor})
+		set(Vitis_VERSION_MINOR ${vppVersionMinor})
+	else()
+		if (${vppVersionMajor} LESS ${Vitis_FIND_VERSION_MAJOR})
+			message(STATUS "Error: Vitis major version is too old")
+		elseif(${vppVersionMinor} LESS ${Vitis_FIND_VERSION_MINOR})
+			message(STATUS "Error: Vitis minor version is too old")
+		else()
+			set(Vitis_VERSION_MAJOR ${vppVersionMajor})
+			set(Vitis_VERSION_MINOR ${vppVersionMinor})
+		endif()
+	endif()
 endif(NOT VITIS_VPP)
 
 # Find AIE tools
@@ -188,4 +213,7 @@ FIND_PACKAGE_HANDLE_STANDARD_ARGS(Vitis HANDLE_COMPONENTS REQUIRED_VARS
 		VITIS_AIETOOLS_DIR
 		VITIS_XCHESSCC
 		VITIS_XCHESS_MAKE
-		VITIS_DSPLIB_INCLUDE_DIR)
+		VITIS_DSPLIB_INCLUDE_DIR
+		Vitis_VERSION_MAJOR
+		Vitis_VERSION_MINOR
+		)
