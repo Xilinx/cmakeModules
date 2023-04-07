@@ -30,10 +30,24 @@
 #
 ###############################################################################
 
+###########################################################
+#
+## 1: Setup:
+# The following environmental variables are optionally searched for defaults:
+#  none.
+#
+## 2: Variables
+# The following are set after configuration is done: 
+#  
+#  XILINX_XAIE_INCLUDE_DIR - LibXAIE (xaiengine) full include path
+#  XILINX_XAIE_LIBS - LibXAIE (xaiengine) full library path
+#
+###########################################################
+
 #set(CMAKE_FIND_DEBUG_MODE 1)
 
 find_library(XILINX_XAIE_LIBS xaiengine
-  PATHS /lib /usr/lib /opt/xaiengine/lib /opt/xaienginev2/lib ${LibXAIE_DIR}/lib
+  PATHS /lib /usr/lib /opt/xaiengine/lib /opt/xaienginev2/lib 
 )
 
 if(XILINX_XAIE_LIBS)
