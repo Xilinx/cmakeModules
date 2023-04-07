@@ -34,7 +34,7 @@
 #             Stephen Neuendorffer <stephen.neuendorffer@amd.com>
 #     Date:   2018/9/23
 
-# cmake -DCMAKE_TOOLCHAIN_FILE=toolchain_vitis_crosscomp_arm.cmake ..
+# cmake -DCMAKE_TOOLCHAIN_FILE=toolchain_clang_crosscomp_arm.cmake ..
 #  -DArch="arm32 or arm64"
 #  -DSysroot="absolute path to the sysroot folder"
 
@@ -102,9 +102,7 @@ set(CMAKE_FIND_ROOT_PATH_MODE_PACKAGE ONLY)
 # search programs in the host environment
 set(CMAKE_FIND_ROOT_PATH_MODE_PROGRAM NEVER)
 
-# needed so clang references the right libstdc++
-find_path(gcc_path "gcc")
-set(GCC_INSTALL_PREFIX ${gcc_path}/.. CACHE STRING "" FORCE)
+# clang specifics
 set(CMAKE_EXE_LINKER_FLAGS "-Wl,-z,notext -fuse-ld=lld" CACHE STRING "" FORCE)
 set(CMAKE_SHARED_LINKER_FLAGS "-Wl,-z,notext -fuse-ld=lld" CACHE STRING "" FORCE)
 
