@@ -33,7 +33,7 @@
 #set(CMAKE_FIND_DEBUG_MODE 1)
 
 find_library(XILINX_XAIE_LIBS xaiengine
-  PATHS /lib /usr/lib /opt/xaiengine/lib /opt/xaienginev2/lib
+  PATHS /lib /usr/lib /opt/xaiengine/lib /opt/xaienginev2/lib ${LibXAIE_DIR}/lib
 )
 
 if(XILINX_XAIE_LIBS)
