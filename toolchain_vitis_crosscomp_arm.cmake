@@ -36,12 +36,12 @@
 #     NOTE: Currenlty only Vitis default sysroot tested and supported
 
 # cmake -DCMAKE_TOOLCHAIN_FILE=toolchain_vitis_crosscomp_arm.cmake ..
-#  -DVitisArch="arm32 or arm64"
-#  -DVitisSysroot="absolute path to the sysroot folder"
+#  -DArch="arm32 or arm64"
+#  -DSysroot="absolute path to the sysroot folder"
 
-set(VitisArch "arm64" CACHE STRING "ARM arch: arm64 or arm32")
+set(Arch "arm64" CACHE STRING "ARM arch: arm64 or arm32")
 
-list(APPEND CMAKE_TRY_COMPILE_PLATFORM_VARIABLES VitisSysroot VitisArch)
+list(APPEND CMAKE_TRY_COMPILE_PLATFORM_VARIABLES Sysroot Arch)
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_LIST_DIR})
 set(CMAKE_TRY_COMPILE_TARGET_TYPE "STATIC_LIBRARY" CACHE STRING "" FORCE)
@@ -61,7 +61,7 @@ else (WIN32)
   SET(VitisHostSystemName "lin")
 endif (WIN32)
 
-if (${VitisArch} STREQUAL "arm64") # 64 bit toolchain
+if (${Arch} STREQUAL "arm64") # 64 bit toolchain
   SET (CMAKE_SYSTEM_PROCESSOR aarch64)
   SET (gnuPrefix1 aarch64-linux)
   SET (gnuPrefix2 aarch64-linux-gnu)
@@ -69,7 +69,7 @@ if (${VitisArch} STREQUAL "arm64") # 64 bit toolchain
   SET (sysrootPrefix aarch64-xilinx-linux)
   #extra compilation flags
   #NONE
-else (${VitisArch} STREQUAL "arm64") #32 bit toolchain
+else (${Arch} STREQUAL "arm64") #32 bit toolchain
   SET (CMAKE_SYSTEM_PROCESSOR arm)
   SET (gnuPrefix1 gcc-arm-linux-gnueabi)
   SET (gnuPrefix2 arm-linux-gnueabihf)
@@ -78,7 +78,7 @@ else (${VitisArch} STREQUAL "arm64") #32 bit toolchain
   #extra compilation flags
   SET (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -D__ARM_PCS_VFP")
 
-endif (${VitisArch} STREQUAL "arm64")
+endif (${Arch} STREQUAL "arm64")
 
 
 # specify the cross compiler
@@ -87,8 +87,8 @@ set(CMAKE_CXX_COMPILER ${VitisRoot}/gnu/${gnuArch}/${VitisHostSystemName}/${gnuP
 set(CMAKE_LINKER ${VitisRoot}/gnu/${gnuArch}/${VitisHostSystemName}/${gnuPrefix1}/bin/aarch64-linux-gnu-ld)
 set(CMAKE_AR ${VitisRoot}/gnu/${gnuArch}/${VitisHostSystemName}/${gnuPrefix1}/bin/${gnuPrefix2}-ar)
 
-#find sysroot first try the command line argument VitisSysroot, then try to find it as part Vitis
-find_path(VitisSysrootAsFound "usr/include/stdlib.h" PATHS ${VitisSysroot} PATH_SUFFIXES "" NO_DEFAULT_PATH)
+#find sysroot first try the command line argument Sysroot, then try to find it as part Vitis
+find_path(VitisSysrootAsFound "usr/include/stdlib.h" PATHS ${Sysroot} PATH_SUFFIXES "" NO_DEFAULT_PATH)
 find_path(VitisSysrootAsFound "usr/include/stdlib.h" PATHS "${VitisRoot}/gnu/${gnuArch}/${VitisHostSystemName}/${gnuPrefix1}/${sysrootPrefix}/" PATH_SUFFIXES "" NO_DEFAULT_PATH)
 find_path(VitisSysrootAsFound "usr/include/stdlib.h" PATHS "${CMAKE_FIND_ROOT_PATH}/libc" PATH_SUFFIXES "" NO_DEFAULT_PATH)
 MESSAGE ("Vitis sysroot: " ${VitisSysrootAsFound})
