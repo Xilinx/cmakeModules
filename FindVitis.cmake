@@ -75,15 +75,15 @@ endif()
 #if Xilinx tools correctly installed they are added to $ENV{PATH} one of CMake's default search paths
 
 # Find v++
-find_program(VITIS_VPP v++)
+find_program(VITIS_VPP v++ HINTS "${VITIS_ROOT}/bin")
 if(NOT VITIS_VPP)
 	message(STATUS "Unable to find v++")
 else(NOT VITIS_VPP)
 	message(STATUS "Found v++: ${VITIS_VPP}")
 	get_filename_component(VITIS_PARENT ${VITIS_VPP} PATH)
 	get_filename_component(VITIS_ROOT ${VITIS_PARENT} PATH)
-	execute_process(COMMAND v++ -v
-		OUTPUT_VARIABLE vppVersionOutput	
+	execute_process(COMMAND ${VITIS_VPP} -v
+		OUTPUT_VARIABLE vppVersionOutput
 	)
 	string(REGEX MATCH "v[0-9]+\.[0-9]" vppVersionNumber ${vppVersionOutput})
 	string(REGEX MATCH "[0-9]+" vppVersionMajor ${vppVersionNumber})
