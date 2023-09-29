@@ -82,13 +82,13 @@ else(NOT VITIS_VPP)
 	message(STATUS "Found v++: ${VITIS_VPP}")
 	get_filename_component(VITIS_PARENT ${VITIS_VPP} PATH)
 	get_filename_component(VITIS_ROOT ${VITIS_PARENT} PATH)
-	execute_process(COMMAND v++ -v
+	execute_process(COMMAND ${VITIS_VPP} -v
 		OUTPUT_VARIABLE vppVersionOutput	
 	)
 	string(REGEX MATCH "v[0-9]+\.[0-9]" vppVersionNumber ${vppVersionOutput})
 	string(REGEX MATCH "[0-9]+" vppVersionMajor ${vppVersionNumber})
 	string(REGEX MATCH "[0-9]$" vppVersionMinor ${vppVersionNumber})
-	message(STATUS "vpp version number: ${vppVersionNumber}")
+	message(STATUS "v++ version number: ${vppVersionNumber}")
 
 	if(NOT DEFINED Vitis_FIND_VERSION)
 		set(Vitis_VERSION_MAJOR ${vppVersionMajor})
