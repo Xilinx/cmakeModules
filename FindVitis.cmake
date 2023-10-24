@@ -85,6 +85,10 @@ else(NOT VITIS_VPP)
 	execute_process(COMMAND ${VITIS_VPP} -v
 		OUTPUT_VARIABLE vppVersionOutput	
 	)
+	if(NOT vppVersionNumber)
+		message(FATAL_ERROR "Vitis version not found")
+		return()
+	endif()
 	string(REGEX MATCH "v[0-9]+\.[0-9]" vppVersionNumber ${vppVersionOutput})
 	string(REGEX MATCH "[0-9]+" vppVersionMajor ${vppVersionNumber})
 	string(REGEX MATCH "[0-9]$" vppVersionMinor ${vppVersionNumber})
