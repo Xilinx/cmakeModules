@@ -75,7 +75,7 @@ endif()
 #if Xilinx tools correctly installed they are added to $ENV{PATH} one of CMake's default search paths
 
 # Find v++
-find_program(VITIS_VPP v++ PATHS "${VITIS_ROOT}/bin")
+find_program(VITIS_VPP v++)
 if(NOT VITIS_VPP)
 	message(STATUS "Unable to find v++")
 else(NOT VITIS_VPP)
@@ -209,7 +209,6 @@ endforeach()
 
 FIND_PACKAGE_HANDLE_STANDARD_ARGS(Vitis HANDLE_COMPONENTS REQUIRED_VARS
 		VITIS_ROOT
-		VITIS_VPP
 		VITIS_AIETOOLS_DIR
 		VITIS_XCHESSCC
 		VITIS_XCHESS_MAKE
