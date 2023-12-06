@@ -32,39 +32,17 @@
 
 include(FindPackageHandleStandardArgs)
 
-find_program(XRT_XBUTIL xbutil)
-if (XRT_XBUTIL)
-  get_filename_component(XRT_XBUTIL ${XRT_XBUTIL} REALPATH)
-  get_filename_component(XRT_BIN_DIR ${XRT_XBUTIL} DIRECTORY)
-  get_filename_component(XRT_DIR ${XRT_BIN_DIR} DIRECTORY)
-  message(STATUS "Found XRT: ${XRT_DIR}")
-
-  execute_process(COMMAND xbutil examine
-    OUTPUT_VARIABLE xbutilOutput
-  )
-  string(REPLACE "\n" ";" xbutilOutput ${xbutilOutput})
-
-  #  Devices present
-  #  BDF             :  Shell    Logic UUID                            Device ID     Device Ready*
-  # -----------------------------------------------------------------------------------------------
-  # [0000:c5:00.1]  :  Phoenix  00000000-0000-0000-0000-000000000000  user(inst=0)  Yes
-  foreach(line ${xbutilOutput})
-    if (line MATCHES "^\\[.*Phoenix.* Yes")
-      string(REGEX REPLACE "^\\[(.*)\\].*" "\\1" XRT_DEVICE ${line})
-      message(STATUS "Found ready XRT device: ${XRT_DEVICE}")
-    endif()
-  endforeach()
-
-endif()
-
-find_library(XRT_COREUTIL xrt_coreutil PATHS ${XRT_DIR}/lib)
+find_library(XRT_COREUTIL xrt_coreutil)
 if (XRT_COREUTIL)
   message(STATUS "Found libxrt_coreutil")
   get_filename_component(XRT_COREUTIL ${XRT_COREUTIL} REALPATH)
   get_filename_component(XRT_LIB_DIR ${XRT_COREUTIL} DIRECTORY)
+  get_filename_component(XRT_DIR ${XRT_LIB_DIR} DIRECTORY)
+  set(XRT_BIN_DIR ${XRT_DIR}/bin)
+  set(XRT_INCLUDE_DIR ${XRT_DIR}/include)
 endif()
 
 find_package_handle_standard_args(XRT
   FOUND_VAR XRT_FOUND
-  REQUIRED_VARS XRT_LIB_DIR XRT_BIN_DIR
+  REQUIRED_VARS XRT_LIB_DIR XRT_BIN_DIR XRT_INCLUDE_DIR
   )
