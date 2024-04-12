@@ -32,7 +32,9 @@
 
 include(FindPackageHandleStandardArgs)
 
-find_library(XRT_COREUTIL xrt_coreutil)
+find_library(XRT_COREUTIL xrt_coreutil
+  PATH_SUFFIXES ../lib
+  )
 if (XRT_COREUTIL)
   message(STATUS "Found libxrt_coreutil")
   get_filename_component(XRT_COREUTIL ${XRT_COREUTIL} REALPATH)
@@ -40,6 +42,8 @@ if (XRT_COREUTIL)
   get_filename_component(XRT_DIR ${XRT_LIB_DIR} DIRECTORY)
   set(XRT_BIN_DIR ${XRT_DIR}/bin)
   set(XRT_INCLUDE_DIR ${XRT_DIR}/include)
+else ()
+  message(STATUS "WARNING: Could not find libxrt_coreutil")
 endif()
 
 find_package_handle_standard_args(XRT
