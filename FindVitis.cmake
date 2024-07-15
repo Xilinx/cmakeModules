@@ -62,6 +62,14 @@
 #  VITIS_AIE2_LIBM - 'libm.a' with full path
 #  VITIS_AIE2_RUNTIME_INCLUDE_DIR - AIE2 runtime full include path
 #  VITIS_AIE2_LIBSOFTFLOAT - 'softfloat.a' with full path
+
+### 3.2. AIE2P
+#  VITIS_AIE2P_INCLUDE_DIR - AIE2P full include path
+#  VITIS_AIE2P_LIBME - 'libme.a' with full path
+#  VITIS_AIE2P_LIBC - 'libc.a' with full path
+#  VITIS_AIE2P_LIBM - 'libm.a' with full path
+#  VITIS_AIE2P_RUNTIME_INCLUDE_DIR - AIE2P runtime full include path
+#  VITIS_AIE2P_LIBSOFTFLOAT - 'softfloat.a' with full path
 #----------------------------------------------------------
 
 include(FindPackageHandleStandardArgs)
@@ -147,6 +155,11 @@ foreach(comp ${Vitis_FIND_COMPONENTS})
 		set(aieVersionSpecificPath "versal_prod")
 	elseif(${comp} STREQUAL "AIE2")
 		set(aieVersionSpecificPath "aie_ml")
+	elseif(${comp} STREQUAL "AIE2P")
+		set(aieVersionSpecificPath "aie2p")
+	else()
+		message(ERROR "${comp} not supported")
+		set(aieVersionSpecificPath "unknown")
 	endif()
 
 	# Find aie_core.h
