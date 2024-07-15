@@ -157,6 +157,9 @@ foreach(comp ${Vitis_FIND_COMPONENTS})
 		set(aieVersionSpecificPath "aie_ml")
 	elseif(${comp} STREQUAL "AIE2P")
 		set(aieVersionSpecificPath "aie2p")
+	else()
+		message(ERROR "${comp} not supported")
+		set(aieVersionSpecificPath "unknown")
 	endif()
 
 	# Find aie_core.h
