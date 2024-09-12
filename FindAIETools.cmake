@@ -39,7 +39,7 @@
 ## 2: Variables
 # The following are set after configuration is done: 
 #  
-#  AIETOOLS_DIR - The path to Aietools installation directory for the specified version
+#  AIETOOLS_DIR - The path to AIETools installation directory for the specified version
 #  AIETOOLS_XCHESSCC - 'xchesscc' with full path
 #  AIETOOLS_XCHESS_MAKE - 'xchessmk' with full path
 #
@@ -64,10 +64,12 @@
 
 include(FindPackageHandleStandardArgs)
 
-list(LENGTH Aietools_FIND_COMPONENTS componentsSize)
+cmake_policy(SET CMP0144 NEW)
+
+list(LENGTH AIETools_FIND_COMPONENTS componentsSize)
 if(componentsSize EQUAL 0)
  	message(STATUS "Error: AIE version needed as COMPONENT, setting AIE as default")
-	list(APPEND Aietools_FIND_COMPONENTS "AIE")
+	list(APPEND AIETools_FIND_COMPONENTS "AIE")
 endif()
 
 #if Xilinx tools correctly installed they are added to $ENV{PATH} one of CMake's default search paths
@@ -98,17 +100,17 @@ else(NOT AIETOOLS_AIECOMPILER)
 		return()
 	endif()
 
-	if(NOT DEFINED Aietools_FIND_VERSION)
-		set(Aietools_VERSION_MAJOR ${aiecompilerVersionMajor})
-		set(Aietools_VERSION_MINOR ${aiecompilerVersionMinor})
+	if(NOT DEFINED AIETools_FIND_VERSION)
+		set(AIETools_VERSION_MAJOR ${aiecompilerVersionMajor})
+		set(AIETools_VERSION_MINOR ${aiecompilerVersionMinor})
 	else()
-		if (${aiecompilerVersionMajor} LESS ${Aietools_FIND_VERSION_MAJOR})
-			message(STATUS "Error: Aietools major version is too old")
-		elseif((${aiecompilerVersionMajor} EQUAL ${Aietools_FIND_VERSION_MAJOR}) AND (${aiecompilerVersionMinor} LESS ${Aietools_FIND_VERSION_MINOR}))
-			message(STATUS "Error: Aietools minor version is too old")
+		if (${aiecompilerVersionMajor} LESS ${AIETools_FIND_VERSION_MAJOR})
+			message(STATUS "Error: AIETools major version is too old")
+		elseif((${aiecompilerVersionMajor} EQUAL ${AIETools_FIND_VERSION_MAJOR}) AND (${aiecompilerVersionMinor} LESS ${AIETools_FIND_VERSION_MINOR}))
+			message(STATUS "Error: AIETools minor version is too old")
 		else()
-			set(Aietools_VERSION_MAJOR ${aiecompilerVersionMajor})
-			set(Aietools_VERSION_MINOR ${aiecompilerVersionMinor})
+			set(AIETools_VERSION_MAJOR ${aiecompilerVersionMajor})
+			set(AIETools_VERSION_MINOR ${aiecompilerVersionMinor})
 		endif()
 	endif()
 endif(NOT AIETOOLS_AIECOMPILER)
@@ -131,7 +133,7 @@ else(NOT AIETOOLS_XCHESS_MAKE)
 endif(NOT AIETOOLS_XCHESS_MAKE)
 
 # Find Components
-foreach(comp ${Aietools_FIND_COMPONENTS})
+foreach(comp ${AIETools_FIND_COMPONENTS})
 	message(STATUS "looking for component: ${comp}")
 
 	if(${comp} STREQUAL "AIE")
@@ -200,17 +202,17 @@ foreach(comp ${Aietools_FIND_COMPONENTS})
 		message(STATUS "Found ${comp} libsoftfloat.a:${AIETOOLS_${comp}_LIBSOFTFLOAT}")
 	endif(NOT AIETOOLS_${comp}_LIBSOFTFLOAT)
 
-	#find_package(Aietools${comp})
+	#find_package(AIETools${comp})
 	if (AIETOOLS_${comp}_INCLUDE_DIR AND AIETOOLS_${comp}_LIBME AND AIETOOLS_${comp}_LIBC AND AIETOOLS_${comp}_LIBM AND AIETOOLS_${comp}_RUNTIME_INCLUDE_DIR AND AIETOOLS_${comp}_LIBSOFTFLOAT)
-		set(Aietools_${comp}_FOUND TRUE)
+		set(AIETools_${comp}_FOUND TRUE)
 	endif()
 
 endforeach()
 
-FIND_PACKAGE_HANDLE_STANDARD_ARGS(Aietools HANDLE_COMPONENTS REQUIRED_VARS
+FIND_PACKAGE_HANDLE_STANDARD_ARGS(AIETools HANDLE_COMPONENTS REQUIRED_VARS
 		AIETOOLS_DIR
 		AIETOOLS_XCHESSCC
 		AIETOOLS_XCHESS_MAKE
-		Aietools_VERSION_MAJOR
-		Aietools_VERSION_MINOR
+		AIETools_VERSION_MAJOR
+		AIETools_VERSION_MINOR
 		)

@@ -118,36 +118,12 @@ else(NOT VITIS_VPP)
 endif(NOT VITIS_VPP)
 
 # Find AIE tools
-find_program(VITIS_XCHESSCC xchesscc PATHS ${VITIS_ROOT}/aietools/bin)
-if(NOT VITIS_XCHESSCC)
-	message(STATUS "Unable to find xchesscc")
-else(NOT VITIS_XCHESSCC)
-	message(STATUS "Found xchesscc: ${VITIS_XCHESSCC}")
-	get_filename_component(_bindir ${VITIS_XCHESSCC} DIRECTORY)
-	get_filename_component(VITIS_AIETOOLS_DIR ${_bindir} DIRECTORY)
-endif(NOT VITIS_XCHESSCC)
+find_package(AIETools ${Vitis_FIND_VERSION_MAJOR}.${Vitis_FIND_VERSION_MINOR} COMPONENTS ${Vitis_FIND_COMPONENTS})
+set(VITIS_AIETOOLS_DIR ${AIETOOLS_DIR})
+set(VITIS_XCHESSCC ${AIETOOLS_XCHESSCC})
+set(VITIS_XCHESS_MAKE ${AIETOOLS_XCHESS_MAKE})
 
-find_program(VITIS_XCHESS_MAKE xchessmk PATHS ${VITIS_ROOT}/aietools/bin)
-if(NOT VITIS_XCHESS_MAKE)
-	message(STATUS "Unable to find xchessmk")
-else(NOT VITIS_XCHESS_MAKE)
-	message(STATUS "Found xchessmk: ${VITIS_XCHESS_MAKE}")
-	get_filename_component(_bindir ${VITIS_XCHESS_MAKE} DIRECTORY)
-	get_filename_component(VITIS_AIETOOLS_DIR ${_bindir} DIRECTORY)
-endif(NOT VITIS_XCHESS_MAKE)
-
-# Find DSPLIB include
-find_path(VITIS_DSPLIB_INCLUDE_DIR "fir.h" PATHS ${VITIS_ROOT}/include/dsplib
-		CMAKE_FIND_ROOT_PATH_BOTH)
-
-if(NOT VITIS_DSPLIB_INCLUDE_DIR)
-	message(STATUS "Unable to find Vitis DSPLIB")
-else(NOT VITIS_DSPLIB_INCLUDE_DIR)
-	message(STATUS "Found Vitis DSPLIB include folder: ${VITIS_DSPLIB_INCLUDE_DIR}")
-	set(Vitis_DSPLIB_FOUND TRUE)
-endif(NOT VITIS_DSPLIB_INCLUDE_DIR)
-
-# Find Components
+# Find AIE tools components
 foreach(comp ${Vitis_FIND_COMPONENTS})
 	message(STATUS "looking for component: ${comp}")
 
@@ -163,59 +139,22 @@ foreach(comp ${Vitis_FIND_COMPONENTS})
 	endif()
 
 	# Find aie_core.h
-	find_path(VITIS_${comp}_INCLUDE_DIR "aie_core.h" PATHS ${VITIS_AIETOOLS_DIR}/data/${aieVersionSpecificPath}/lib
-			NO_DEFAULT_PATH CMAKE_FIND_ROOT_PATH_BOTH)
-	if(NOT VITIS_${comp}_INCLUDE_DIR)
-		message(STATUS "Unable to find ${comp} include dir")
-	else(NOT VITIS_${comp}_INCLUDE_DIR)
-		message(STATUS "Found ${comp} include folder: ${VITIS_${comp}_INCLUDE_DIR}")
-	endif(NOT VITIS_${comp}_INCLUDE_DIR)
+	set(VITIS_${comp}_INCLUDE_DIR AIETOOLS_${comp}_INCLUDE_DIR)
 
 	# Find libme.a
-	find_library(VITIS_${comp}_LIBME me NO_DEFAULT_PATH CMAKE_FIND_ROOT_PATH_BOTH PATHS
-			${VITIS_AIETOOLS_DIR}/data/${aieVersionSpecificPath}/lib/Release)
-	if(NOT VITIS_${comp}_LIBME)
-		message(STATUS "Unable to find ${comp} libme.a")
-	else(NOT VITIS_${comp}_LIBME)
-		message(STATUS "Found ${comp} libme.a: ${VITIS_${comp}_LIBME}")
-	endif(NOT VITIS_${comp}_LIBME)
+	set(VITIS_${comp}_LIBME AIETOOLS_${comp}_LIBME)
 
 	# Find AIE LIBC
-	find_library(VITIS_${comp}_LIBC c NO_DEFAULT_PATH CMAKE_FIND_ROOT_PATH_BOTH PATHS
-				${VITIS_AIETOOLS_DIR}/data/${aieVersionSpecificPath}/lib/runtime/lib/Release)
-	if(NOT VITIS_${comp}_LIBC)
-		message(STATUS "Unable to find ${comp} libc.a")
-	else(NOT VITIS_${comp}_LIBC)
-		message(STATUS "Found ${comp} libc.a:${VITIS_${comp}_LIBC}")
-	endif(NOT VITIS_${comp}_LIBC)
+	set(VITIS_${comp}_LIBC AIETOOLS_${comp}_LIBC)
 
 	# Find AIE LIBM
-	find_library(VITIS_${comp}_LIBM m NO_DEFAULT_PATH CMAKE_FIND_ROOT_PATH_BOTH PATHS
-				${VITIS_AIETOOLS_DIR}/data/${aieVersionSpecificPath}/lib/runtime/lib/Release)
-	if(NOT VITIS_${comp}_LIBM)
-		message(STATUS "Unable to find ${comp} libm.a")
-	else(NOT VITIS_${comp}_LIBM)
-		message(STATUS "Found ${comp} libm.a:${VITIS_${comp}_LIBM}")
-	endif(NOT VITIS_${comp}_LIBM)
+	set(VITIS_${comp}_LIBM AIETOOLS_${comp}_LIBM)
 
 	# Find assert.h in AIE runtime include dir
-	find_path(VITIS_${comp}_RUNTIME_INCLUDE_DIR "assert.h" PATHS ${VITIS_AIETOOLS_DIR}/data/${aieVersionSpecificPath}/lib/runtime/include
-		NO_DEFAULT_PATH CMAKE_FIND_ROOT_PATH_BOTH)
-	
-	if(NOT VITIS_${comp}_RUNTIME_INCLUDE_DIR)
-		message(STATUS "Unable to find ${comp} runtime include dir")
-	else(NOT VITIS_${comp}_RUNTIME_INCLUDE_DIR)
-		message(STATUS "Found ${comp} runtime include folder: ${VITIS_${comp}_RUNTIME_INCLUDE_DIR}")
-	endif(NOT VITIS_${comp}_RUNTIME_INCLUDE_DIR)
+	set(VITIS_${comp}_RUNTIME_INCLUDE_DIR AIETOOLS_${comp}_RUNTIME_INCLUDE_DIR)
 
 	# Find AIE LIBSOFTFLOAT
-	find_library(VITIS_${comp}_LIBSOFTFLOAT softfloat NO_DEFAULT_PATH CMAKE_FIND_ROOT_PATH_BOTH PATHS
-				${VITIS_AIETOOLS_DIR}/data/${aieVersionSpecificPath}/lib/softfloat/lib/Release)
-	if(NOT VITIS_${comp}_LIBSOFTFLOAT)
-		message(STATUS "Unable to find ${comp} libsoftfloat.a")
-	else(NOT VITIS_${comp}_LIBSOFTFLOAT)
-		message(STATUS "Found ${comp} libsoftfloat.a:${VITIS_${comp}_LIBSOFTFLOAT}")
-	endif(NOT VITIS_${comp}_LIBSOFTFLOAT)
+	set(VITIS_${comp}_LIBSOFTFLOAT AIETOOLS_${comp}_LIBSOFTFLOAT)
 
 	#find_package(Vitis${comp})
 	if (VITIS_${comp}_INCLUDE_DIR AND VITIS_${comp}_LIBME AND VITIS_${comp}_LIBC AND VITIS_${comp}_LIBM AND VITIS_${comp}_RUNTIME_INCLUDE_DIR AND VITIS_${comp}_LIBSOFTFLOAT)
@@ -223,6 +162,17 @@ foreach(comp ${Vitis_FIND_COMPONENTS})
 	endif()
 
 endforeach()
+
+# Find DSPLIB include
+find_path(VITIS_DSPLIB_INCLUDE_DIR "fir.h" PATHS ${VITIS_ROOT}/include/dsplib
+		CMAKE_FIND_ROOT_PATH_BOTH)
+
+if(NOT VITIS_DSPLIB_INCLUDE_DIR)
+	message(STATUS "Unable to find Vitis DSPLIB")
+else(NOT VITIS_DSPLIB_INCLUDE_DIR)
+	message(STATUS "Found Vitis DSPLIB include folder: ${VITIS_DSPLIB_INCLUDE_DIR}")
+	set(Vitis_DSPLIB_FOUND TRUE)
+endif(NOT VITIS_DSPLIB_INCLUDE_DIR)
 
 FIND_PACKAGE_HANDLE_STANDARD_ARGS(Vitis HANDLE_COMPONENTS REQUIRED_VARS
 		VITIS_ROOT
