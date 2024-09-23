@@ -118,7 +118,7 @@ else(NOT VITIS_VPP)
 endif(NOT VITIS_VPP)
 
 # Find AIE tools
-find_package(AIETools ${Vitis_FIND_VERSION_MAJOR}.${Vitis_FIND_VERSION_MINOR} COMPONENTS ${Vitis_FIND_COMPONENTS})
+find_package(AIETools ${Vitis_VERSION_MAJOR}.${Vitis_VERSION_MINOR} COMPONENTS ${Vitis_FIND_COMPONENTS})
 set(VITIS_AIETOOLS_DIR ${AIETOOLS_DIR})
 set(VITIS_XCHESSCC ${AIETOOLS_XCHESSCC})
 set(VITIS_XCHESS_MAKE ${AIETOOLS_XCHESS_MAKE})
@@ -139,22 +139,22 @@ foreach(comp ${Vitis_FIND_COMPONENTS})
 	endif()
 
 	# Find aie_core.h
-	set(VITIS_${comp}_INCLUDE_DIR AIETOOLS_${comp}_INCLUDE_DIR)
+	set(VITIS_${comp}_INCLUDE_DIR ${AIETOOLS_${comp}_INCLUDE_DIR})
 
 	# Find libme.a
-	set(VITIS_${comp}_LIBME AIETOOLS_${comp}_LIBME)
+	set(VITIS_${comp}_LIBME ${AIETOOLS_${comp}_LIBME})
 
 	# Find AIE LIBC
-	set(VITIS_${comp}_LIBC AIETOOLS_${comp}_LIBC)
+	set(VITIS_${comp}_LIBC ${AIETOOLS_${comp}_LIBC})
 
 	# Find AIE LIBM
-	set(VITIS_${comp}_LIBM AIETOOLS_${comp}_LIBM)
+	set(VITIS_${comp}_LIBM ${AIETOOLS_${comp}_LIBM})
 
 	# Find assert.h in AIE runtime include dir
-	set(VITIS_${comp}_RUNTIME_INCLUDE_DIR AIETOOLS_${comp}_RUNTIME_INCLUDE_DIR)
+	set(VITIS_${comp}_RUNTIME_INCLUDE_DIR ${AIETOOLS_${comp}_RUNTIME_INCLUDE_DIR})
 
 	# Find AIE LIBSOFTFLOAT
-	set(VITIS_${comp}_LIBSOFTFLOAT AIETOOLS_${comp}_LIBSOFTFLOAT)
+	set(VITIS_${comp}_LIBSOFTFLOAT ${AIETOOLS_${comp}_LIBSOFTFLOAT})
 
 	#find_package(Vitis${comp})
 	if (VITIS_${comp}_INCLUDE_DIR AND VITIS_${comp}_LIBME AND VITIS_${comp}_LIBC AND VITIS_${comp}_LIBM AND VITIS_${comp}_RUNTIME_INCLUDE_DIR AND VITIS_${comp}_LIBSOFTFLOAT)
