@@ -147,6 +147,26 @@ foreach(comp ${AIETools_FIND_COMPONENTS})
 		set(aieVersionSpecificPath "unknown")
 	endif()
 
+	if(${comp} STREQUAL "AIE")
+		set(aieVersionTargetPath "target")
+	elseif(${comp} STREQUAL "AIE2")
+		set(aieVersionTargetPath "target_aie_ml")
+	elseif(${comp} STREQUAL "AIE2P")
+		set(aieVersionTargetPath "target_aie2p")
+	else()
+		message(ERROR "${comp} not supported")
+		set(aieVersionTargetPath "unknown")
+	endif()
+
+	# Find chesscc
+	find_path(AIETOOLS_${comp}_CHESSCC "chesscc" PATHS ${AIETOOLS_DIR}/tps/lnx64/${aieVersionTargetPath}/bin/LNa64bin
+			NO_DEFAULT_PATH CMAKE_FIND_ROOT_PATH_BOTH)
+	if(NOT AIETOOLS_${comp}_CHESSCC)
+		message(STATUS "Unable to find ${comp} chesscc")
+	else(NOT AIETOOLS_${comp}_CHESSCC)
+		message(STATUS "Found ${comp} chesscc: ${AIETOOLS_${comp}_CHESSCC}")
+	endif(NOT AIETOOLS_${comp}_CHESSCC)
+
 	# Find aie_core.h
 	find_path(AIETOOLS_${comp}_INCLUDE_DIR "aie_core.h" PATHS ${AIETOOLS_DIR}/data/${aieVersionSpecificPath}/lib
 			NO_DEFAULT_PATH CMAKE_FIND_ROOT_PATH_BOTH)
@@ -203,7 +223,7 @@ foreach(comp ${AIETools_FIND_COMPONENTS})
 	endif(NOT AIETOOLS_${comp}_LIBSOFTFLOAT)
 
 	#find_package(AIETools${comp})
-	if (AIETOOLS_${comp}_INCLUDE_DIR AND AIETOOLS_${comp}_LIBME AND AIETOOLS_${comp}_LIBC AND AIETOOLS_${comp}_LIBM AND AIETOOLS_${comp}_RUNTIME_INCLUDE_DIR AND AIETOOLS_${comp}_LIBSOFTFLOAT)
+	if (AIETOOLS_${comp}_INCLUDE_DIR AND AIETOOLS_${comp}_LIBME AND AIETOOLS_${comp}_LIBC AND AIETOOLS_${comp}_LIBM AND AIETOOLS_${comp}_RUNTIME_INCLUDE_DIR AND AIETOOLS_${comp}_LIBSOFTFLOAT AND AIETOOLS_${comp}_CHESSCC)
 		set(AIETools_${comp}_FOUND TRUE)
 	endif()
 
