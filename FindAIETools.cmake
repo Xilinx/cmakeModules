@@ -151,11 +151,9 @@ foreach(comp ${AIETools_FIND_COMPONENTS})
 		set(aieVersionTargetPath "target")
 	elseif(${comp} STREQUAL "AIE2")
 		set(aieVersionTargetPath "target_aie_ml")
-	elseif(${comp} STREQUAL "AIE2P")
-		set(aieVersionTargetPath "target_aie2p")
 	else()
-		message(ERROR "${comp} not supported")
-		set(aieVersionTargetPath "unknown")
+		string(TOLOWER ${comp} aiearch)
+		set(aieVersionTargetPath "target_${aiearch}")
 	endif()
 
 	# Find chesscc
