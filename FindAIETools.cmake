@@ -121,11 +121,26 @@ if(NOT AIETOOLS_XCHESSCC)
 	message(STATUS "Unable to find xchesscc")
 else(NOT VITIS_XCHESSCC)
 	message(STATUS "Found xchesscc: ${AIETOOLS_XCHESSCC}")
-	get_filename_component(_bindir ${AIETOOLS_XCHESSCC} DIRECTORY)
-	get_filename_component(AIETOOLS_DIR ${_bindir} DIRECTORY)
+	get_filename_component(AIETOOLS_BIN_DIR ${AIETOOLS_XCHESSCC} DIRECTORY)
+	get_filename_component(_aietools_dir ${AIETOOLS_BIN_DIR} DIRECTORY)
 endif(NOT AIETOOLS_XCHESSCC)
 
-find_program(AIETOOLS_XCHESS_MAKE xchessmk PATHS ${AIETOOLS_DIR})
+# Find the include directory by searching for adf.h. Search in:
+#  1) dirname(`which xchesscc`)/../include which is the Vitis install path
+#  2) $ENV{SITE_PACKAGES}/include which is the RyzenAI Software install path
+find_path(AIETOOLS_INCLUDE_DIR "adf.h"
+		PATHS ${_aietools_dir}/include $ENV{SITE_PACKAGES}/include REQUIRED)
+if(NOT AIETOOLS_INCLUDE_DIR)
+	message(STATUS "Unable to find aietools directory")
+else()
+	get_filename_component(AIETOOLS_DIR ${AIETOOLS_INCLUDE_DIR} DIRECTORY)
+endif()
+
+message(STATUS "aietools directory: ${AIETOOLS_DIR}")
+message(STATUS "aietools binary directory: ${AIETOOLS_BINARY_DIR}")
+message(STATUS "aietools include directory: ${AIETOOLS_INCLUDE_DIR}")
+
+find_program(AIETOOLS_XCHESS_MAKE xchessmk PATHS ${AIETOOLS_BIN_DIR})
 if(NOT AIETOOLS_XCHESS_MAKE)
 	message(STATUS "Unable to find xchessmk")
 else(NOT AIETOOLS_XCHESS_MAKE)
