@@ -40,6 +40,8 @@
 # The following are set after configuration is done: 
 #  
 #  AIETOOLS_DIR - The path to AIETools installation directory for the specified version
+#  AIETOOLS_BINARY_DIR - The path to AIETools binary installation directory
+#  AIETOOLS_INCLUDE_DIR - The path to AIETools include installation directory
 #  AIETOOLS_XCHESSCC - 'xchesscc' with full path
 #  AIETOOLS_XCHESS_MAKE - 'xchessmk' with full path
 #
@@ -226,6 +228,8 @@ endforeach()
 
 FIND_PACKAGE_HANDLE_STANDARD_ARGS(AIETools HANDLE_COMPONENTS REQUIRED_VARS
 		AIETOOLS_DIR
+		AIETOOLS_BINARY_DIR
+		AIETOOLS_INCLUDE_DIR
 		AIETOOLS_XCHESSCC
 		AIETOOLS_XCHESS_MAKE
 		AIETools_VERSION_MAJOR
