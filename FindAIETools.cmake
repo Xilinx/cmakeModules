@@ -131,7 +131,7 @@ endif(NOT AIETOOLS_XCHESSCC)
 #  1) dirname(`which xchesscc`)/../include which is the Vitis install path
 #  2) $ENV{SITE_PACKAGES}/include which is the RyzenAI Software install path
 find_path(AIETOOLS_INCLUDE_DIR "adf.h"
-		PATHS ${_aietools_dir}/include $ENV{SITE_PACKAGES}/include REQUIRED)
+		PATHS ${_aietools_dir}/include $ENV{SITE_PACKAGES}/include)
 if(NOT AIETOOLS_INCLUDE_DIR)
 	message(STATUS "Unable to find aietools directory")
 else()
