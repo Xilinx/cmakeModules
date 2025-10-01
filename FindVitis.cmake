@@ -101,9 +101,16 @@ else(NOT VITIS_VPP)
 	execute_process(COMMAND ${VITIS_VPP} -v
 		OUTPUT_VARIABLE vppVersionOutput	
 	)
-	string(REGEX MATCH "v[0-9]+\.[0-9]" vppVersionNumber ${vppVersionOutput})
-	string(REGEX MATCH "[0-9]+" vppVersionMajor ${vppVersionNumber})
-	string(REGEX MATCH "[0-9]$" vppVersionMinor ${vppVersionNumber})
+	# Extract version of form v<major>.<minor>[.<patch>] from output of 'v++ -v'
+	# Captured groups:
+	#  CMAKE_MATCH_0 : full match (e.g. v2025.1.3)
+	#  CMAKE_MATCH_1 : major
+	#  CMAKE_MATCH_2 : minor
+	#  CMAKE_MATCH_4 : patch (group 3 wraps the optional .patch)
+	string(REGEX MATCH "v\\+\\+ v([0-9]+)\\.([0-9]+)(\\.([0-9]+))?" vppVersionNumber ${vppVersionOutput})
+	set(vppVersionMajor ${CMAKE_MATCH_1})
+	set(vppVersionMinor ${CMAKE_MATCH_2})
+	set(vppVersionPatch ${CMAKE_MATCH_4})
 	message(STATUS "v++ version number: ${vppVersionNumber}")
 	if(NOT vppVersionNumber)
 		message(FATAL_ERROR "Vitis version not found")
