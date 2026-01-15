@@ -101,13 +101,15 @@ else(NOT VITIS_VPP)
 	execute_process(COMMAND ${VITIS_VPP} -v
 		OUTPUT_VARIABLE vppVersionOutput	
 	)
-	# Extract version of form v<major>.<minor>[.<patch>] from output of 'v++ -v'
+	# Extract version of form v<major>.<minor>[.<patch>][_suffix] from output of 'v++ -v'
+	# Handles various v++ variants (e.g., v++, v++_aie_essentials)
 	# Captured groups:
-	#  CMAKE_MATCH_0 : full match (e.g. v2025.1.3)
+	#  CMAKE_MATCH_0 : full match (e.g. v++ v2025.1.3 or v++_aie_essentials v2024.2_RAI_1_2)
 	#  CMAKE_MATCH_1 : major
 	#  CMAKE_MATCH_2 : minor
 	#  CMAKE_MATCH_4 : patch (group 3 wraps the optional .patch)
-	string(REGEX MATCH "v\\+\\+ v([0-9]+)\\.([0-9]+)(\\.([0-9]+))?" vppVersionNumber ${vppVersionOutput})
+	#  CMAKE_MATCH_5 : suffix (e.g., _RAI_1_2)
+	string(REGEX MATCH "v\\+\\+.*v([0-9]+)\\.([0-9]+)(\\.([0-9]+))?(_[^ ]*)?" vppVersionNumber ${vppVersionOutput})
 	set(vppVersionMajor ${CMAKE_MATCH_1})
 	set(vppVersionMinor ${CMAKE_MATCH_2})
 	set(vppVersionPatch ${CMAKE_MATCH_4})
