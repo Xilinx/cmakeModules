@@ -32,18 +32,32 @@
 
 include(FindPackageHandleStandardArgs)
 
+set(_path_suffix ../lib)
+
+if (WIN32)
+  # On Windows, the import libs are one directory under, not sideways.
+  set(_path_suffix lib)
+endif()
+
 find_library(XRT_COREUTIL xrt_coreutil
-  PATH_SUFFIXES ../lib
-  )
+  PATH_SUFFIXES ${_path_suffix}
+)
+
 if (XRT_COREUTIL)
-  message(STATUS "Found libxrt_coreutil")
+  message(STATUS "Found xrt_coreutil")
   get_filename_component(XRT_COREUTIL ${XRT_COREUTIL} REALPATH)
   get_filename_component(XRT_LIB_DIR ${XRT_COREUTIL} DIRECTORY)
   get_filename_component(XRT_DIR ${XRT_LIB_DIR} DIRECTORY)
-  set(XRT_BIN_DIR ${XRT_DIR}/bin)
-  set(XRT_INCLUDE_DIR ${XRT_DIR}/include)
-else ()
-  message(STATUS "WARNING: Could not find libxrt_coreutil")
+
+  if (WIN32)
+    set(XRT_BIN_DIR "${XRT_DIR}")
+  else()
+    set(XRT_BIN_DIR "${XRT_DIR}/bin")
+  endif()
+
+  set(XRT_INCLUDE_DIR "${XRT_DIR}/include")
+else()
+  message(STATUS "WARNING: Could not find xrt_coreutil import library")
 endif()
 
 find_package_handle_standard_args(XRT
