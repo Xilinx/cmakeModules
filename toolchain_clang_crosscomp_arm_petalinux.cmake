@@ -49,14 +49,16 @@ list(APPEND CMAKE_TRY_COMPILE_PLATFORM_VARIABLES gccVer)
 
 include(toolchain_clang_crosscomp_arm)
 
-# Vitis/PetaLinux sysroot specific 
-set(CMAKE_C_FLAGS "-Wl,-z,notext -I${Sysroot}/usr/include/c++/${gccVer} -I${Sysroot}/usr/include/c++/${gccVer}/${sysrootPrefix} -B ${Sysroot}/usr/lib/${sysrootPrefix}/${gccVer} -Wl,-rpath-link=${Sysroot}/usr/lib/${sysrootPrefix}/${gccVer} --target=${gnuArch} -Wno-unused-command-line-argument -L${Sysroot}/usr/lib/${sysrootPrefix}/${gccVer}" CACHE STRING "" FORCE)
+# Vitis/PetaLinux sysroot specific
+# Explicitly specify the toolchain because the petalinux sysroot does not have /usr/include mirrored to /include.
+set(CMAKE_C_FLAGS "-Wl,-z,notext --gcc-toolchain=${Sysroot}/usr --target=${gnuArch} -Wno-unused-command-line-argument" CACHE STRING "" FORCE)
 
 # TODO: Does this need -L?
-set(CMAKE_SHARED_LINKER_FLAGS "-Wl,-z,notext -fuse-ld=lld -B ${Sysroot}/usr/lib/${sysrootPrefix}/${gccVer} -L${Sysroot}/usr/lib/${sysrootPrefix}/${gccVer}" CACHE STRING "" FORCE)
+set(CMAKE_SHARED_LINKER_FLAGS "-Wl,-z,notext -fuse-ld=lld" CACHE STRING "" FORCE)
 
 # TODO: Does this need -L?
-set(CMAKE_EXE_LINKER_FLAGS "-Wl,-z,notext -fuse-ld=lld -B ${Sysroot}/usr/lib/${sysrootPrefix}/${gccVer} -L${Sysroot}/usr/lib/${sysrootPrefix}/${gccVer}" CACHE STRING "" FORCE)
+# Force -static linking because otherwise may pickup libpthread.a instead of libpthread.so
+set(CMAKE_EXE_LINKER_FLAGS "-static -Wl,-z,notext -fuse-ld=lld" CACHE STRING "" FORCE)
 
 #set(CMAKE_C_IMPLICIT_LINK_LIBRARIES gcc_s CACHE STRING "" FORCE) 
 #set(CMAKE_CXX_IMPLICIT_LINK_LIBRARIES gcc_s CACHE STRING "" FORCE)
